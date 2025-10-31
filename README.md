@@ -1,179 +1,309 @@
-# Private Repository Releases Site
+# GlossarioBUDA Public Releases Site
 
-A secure, static web application to display and download releases from your private GitHub repositories. Only accessible to those with the direct link.
+A secure web application that makes releases from your **private** GitHub repository **publicly accessible** while keeping your source code private.
 
 ## Features
 
-- 🔒 Displays releases from private GitHub repositories
+- 🔒 **Private repo, public releases** - Source code stays private, releases are public
+- 🔄 **Auto-update compatible** - Works with your app's built-in update checker
 - 📦 Lists all release assets with download functionality
-- 🎨 Beautiful, responsive UI
+- 🎨 Beautiful, responsive UI for browsing releases
 - 📱 Mobile-friendly design
-- 🚀 Easy to deploy to GitHub Pages
-- 🔐 Secure access via obscure URL
+- 🚀 Deployed on Netlify with serverless functions
+- 🔐 GitHub token secured on server, never exposed to users
+
+## Architecture
+
+```
+┌─────────────────────┐
+│  GlossarioBUDA App  │
+│  (checks updates)   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────────────────────────┐
+│  glossariobuda.netlify.app              │
+│  ┌────────────────────────────────────┐ │
+│  │ Serverless Functions (Node.js)     │ │
+│  │ - /releases (GitHub-compatible)    │ │
+│  │ - /download-asset (proxy)          │ │
+│  │ - /get-releases (web UI)           │ │
+│  └───────────┬────────────────────────┘ │
+└──────────────┼──────────────────────────┘
+               │ (uses GitHub token)
+               ▼
+┌─────────────────────────────────────────┐
+│  GitHub API                             │
+│  Private repo: TashiRabten/GlossarioBUDA│
+│  (releases only, code stays private)    │
+└─────────────────────────────────────────┘
+```
 
 ## Files
 
-- `index.html` - Main HTML structure and styling
-- `app.js` - JavaScript logic for fetching and displaying releases
-- `README.md` - This file
+- `index.html` - Web UI for browsing releases
+- `app.js` - Frontend JavaScript for the web UI
+- `netlify.toml` - Netlify configuration
+- `package.json` - Dependencies for serverless functions
+- `netlify/functions/`
+  - `releases.js` - **GitHub-compatible API** for app auto-updates
+  - `get-releases.js` - Fetches all repos for web UI
+  - `download-asset.js` - Proxies file downloads
+- `.env.example` - Template for environment variables
 
-## Configuration
+## Setup & Deployment
 
-### 1. Update GitHub Token (if needed)
+### 1. Configure GitHub Token on Netlify
 
-Your token is already configured in `app.js`. If you need to change it:
+After deploying to Netlify, set the environment variable:
 
-```javascript
-const GITHUB_TOKEN = 'your_token_here';
+**In Netlify UI:**
+1. Go to Site settings → Environment variables
+2. Add variable:
+   - Key: `GITHUB_TOKEN`
+   - Value: Your GitHub personal access token
+
+**Or via CLI:**
+```bash
+netlify env:set GITHUB_TOKEN your_token_here
 ```
 
 ### 2. Add/Remove Repositories
 
-Edit the `REPOSITORIES` array in `app.js`:
+To configure which repos appear in the **web UI**, edit `netlify/functions/get-releases.js:9-13`:
 
 ```javascript
 const REPOSITORIES = [
     { owner: 'TashiRabten', repo: 'GlossarioBUDA' },
     { owner: 'YourUsername', repo: 'AnotherRepo' },
-    // Add more repositories as needed
 ];
 ```
 
-## Deployment Options
+The **auto-update API** (`/releases`) is hardcoded to GlossarioBUDA in `netlify/functions/releases.js:43-44`.
 
-### Option 1: GitHub Pages (Recommended)
+## API Endpoints
 
-This is the easiest way to host your site with a secure, obscure URL.
+Once deployed on Netlify, your site provides these public endpoints:
 
-1. **Create a new PRIVATE repository on GitHub:**
+### 1. GitHub-Compatible Releases API (for app auto-update)
+```
+GET https://glossariobuda.netlify.app/.netlify/functions/releases
+```
+Returns releases in GitHub API format. Use this in your app's update checker.
+
+### 2. Download Asset (public download proxy)
+```
+GET https://glossariobuda.netlify.app/.netlify/functions/download-asset
+    ?owner=TashiRabten
+    &repo=GlossarioBUDA
+    &assetId=12345
+    &filename=app.exe
+```
+Proxies downloads from private repo releases.
+
+### 3. Web UI API (multi-repo)
+```
+GET https://glossariobuda.netlify.app/.netlify/functions/get-releases
+```
+Returns releases from all configured repos for the web UI.
+
+## Updating Your GlossarioBUDA App
+
+To enable auto-updates from your private repo, change the update check URL in your app:
+
+**Before (doesn't work with private repos):**
+```javascript
+const updateURL = 'https://api.github.com/repos/TashiRabten/GlossarioBUDA/releases';
+```
+
+**After (works with private repos):**
+```javascript
+const updateURL = 'https://glossariobuda.netlify.app/.netlify/functions/releases';
+```
+
+The API returns the exact same JSON format as GitHub, so your existing update logic should work without changes. Download URLs are automatically rewritten to use the Netlify proxy.
+
+## Deployment to Netlify
+
+### Option 1: Netlify UI (Recommended)
+
+1. **Push to GitHub** (if not already done):
    ```bash
-   # Initialize git in this directory
-   cd private-releases-site
-   git init
-   git add .
-   git commit -m "Initial commit: Private releases site"
+   git push origin main
    ```
 
-2. **Create a private repo on GitHub:**
-   - Go to https://github.com/new
-   - Name it something obscure like `pr-xyz-2025` (hard to guess)
-   - Make it **PRIVATE**
-   - Don't add README, .gitignore, or license
+2. **Deploy on Netlify:**
+   - Go to https://app.netlify.com/
+   - Click "Add new site" → "Import an existing project"
+   - Choose "GitHub" and authorize
+   - Select repository: `TashiRabten/rel-site-2025`
+   - Settings auto-detect from `netlify.toml`
+   - **IMPORTANT:** Add environment variable:
+     - Key: `GITHUB_TOKEN`
+     - Value: `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`
+   - Click "Deploy site"
 
-3. **Push your code:**
-   ```bash
-   git remote add origin https://github.com/YourUsername/pr-xyz-2025.git
-   git branch -M main
-   git push -u origin main
-   ```
+3. **Configure custom domain** (optional):
+   - In Site settings → Domain management
+   - Your current subdomain: `glossariobuda.netlify.app`
 
-4. **Enable GitHub Pages:**
-   - Go to repository Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `main` → `/root` → Save
-   - Wait a few minutes
+### Option 2: Netlify CLI
 
-5. **Access your site:**
-   - Your site will be at: `https://yourusername.github.io/pr-xyz-2025/`
-   - Only people with this exact URL can access it
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
 
-### Option 2: Local Testing
+# Login
+netlify login
 
-To test locally:
+# Initialize site
+netlify init
 
-1. **Using Python:**
-   ```bash
-   cd private-releases-site
-   python -m http.server 8000
-   ```
-   Then visit: `http://localhost:8000`
+# Set environment variable
+netlify env:set GITHUB_TOKEN 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
 
-2. **Using Node.js:**
-   ```bash
-   npx http-server -p 8000
-   ```
-   Then visit: `http://localhost:8000`
+# Deploy
+netlify deploy --prod
+```
 
-3. **Or just open the file:**
-   - Simply double-click `index.html` in your file browser
-   - Note: Downloads may not work due to CORS restrictions in some browsers
+### Local Testing with Netlify Dev
 
-### Option 3: Other Hosting Platforms
+```bash
+# Install dependencies
+npm install
 
-You can also deploy to:
-- **Netlify**: Drag and drop the folder
-- **Vercel**: Connect your GitHub repo
-- **Cloudflare Pages**: Connect your repo
+# Create .env file
+echo "GITHUB_TOKEN=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" > .env
 
-## Security Considerations
+# Run locally (simulates Netlify environment)
+netlify dev
+```
 
-### Current Approach (Client-Side Token)
-- ✅ Quick and easy to deploy
-- ✅ Works great for personal use
-- ⚠️ Token is visible in browser source code
-- ⚠️ Anyone with the URL can see the token
+Then visit: `http://localhost:8888`
 
-### Making it More Secure
+## Security & Privacy
 
-If you want better security, consider these options:
+### How It Works
 
-1. **Use GitHub Pages from a private repo:**
-   - Only people with the exact URL can access
-   - Use an obscure repository name
-   - Don't share the link publicly
+✅ **GitHub token is secure:**
+- Stored as environment variable on Netlify servers
+- Never exposed to users or in browser code
+- Only serverless functions can access it
 
-2. **Add a simple password protection:**
-   - Add a password prompt before showing releases
-   - Password is hardcoded in JavaScript
+✅ **Repository stays private:**
+- Source code remains completely private
+- Only releases and assets are accessible
+- No way to access repo files or commits through this site
 
-3. **Use a backend service (more complex):**
-   - Deploy the Node.js proxy script you showed me
-   - Frontend calls your backend instead of GitHub directly
-   - Token stays secure on the server
+✅ **Public releases:**
+- Anyone can view and download releases via the Netlify site
+- Perfect for distributing proprietary software
+- Works with app auto-updaters
 
-## Token Permissions
+✅ **CORS enabled:**
+- Apps from any domain can check for updates
+- Downloads work from any origin
 
-Your GitHub token needs these permissions:
-- `repo` - Full control of private repositories
-  - Needed to read releases and download assets from private repos
+### GitHub Token Permissions
+
+Your GitHub token needs:
+- **Scope:** `repo` (Full control of private repositories)
+- **Purpose:** Read releases and download assets from private repos
+- **Security:** Stored securely in Netlify environment variables
+
+### Best Practices
+
+1. **Rotate your token periodically** - Generate a new token every few months
+2. **Use environment variables only** - Never commit tokens to git
+3. **Monitor token usage** - Check GitHub settings for token activity
+4. **Limit token scope** - Only grant `repo` access, nothing more
+
+## Workflow: Releasing a New Version
+
+Here's the complete workflow for releasing a new version of your app:
+
+### 1. Create a Release on GitHub
+
+```bash
+# In your GlossarioBUDA repo
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+Then on GitHub:
+1. Go to `TashiRabten/GlossarioBUDA` → Releases
+2. Click "Draft a new release"
+3. Choose tag: `v1.2.3`
+4. Add release notes
+5. Upload your build artifacts (exe, dmg, etc.)
+6. Click "Publish release"
+
+### 2. Releases Automatically Become Public
+
+- Your private repo release is now accessible at:
+  - Web UI: `https://glossariobuda.netlify.app/`
+  - API: `https://glossariobuda.netlify.app/.netlify/functions/releases`
+- No need to redeploy the Netlify site
+- No need to do anything else!
+
+### 3. Users Get Auto-Updates
+
+- Your app checks the Netlify API endpoint
+- Detects the new version
+- Downloads through the Netlify proxy
+- Updates automatically
+
+**That's it!** The entire process is automated once set up.
 
 ## Troubleshooting
 
-### Releases not loading
-- Check browser console for errors (F12)
-- Verify token has correct permissions
-- Ensure repository names are correct
+### Releases not loading on Netlify site
+- Check Netlify function logs in the Netlify dashboard
+- Verify `GITHUB_TOKEN` environment variable is set
+- Ensure token has `repo` scope
+- Check that repository name is correct in serverless functions
 
-### Downloads not working
-- Must be served via HTTP/HTTPS (not file://)
-- Use local server or deploy to a hosting platform
+### App not detecting updates
+- Verify app is using new URL: `https://glossariobuda.netlify.app/.netlify/functions/releases`
+- Check app's network requests in developer tools
+- Ensure CORS is working (should be, it's enabled)
+- Test the endpoint manually: `curl https://glossariobuda.netlify.app/.netlify/functions/releases`
 
-### GitHub Pages not working
-- Ensure repository is set to private
-- Wait a few minutes after enabling Pages
-- Check Settings → Pages for the published URL
+### Downloads failing
+- Check that asset IDs are correct
+- Verify download-asset function has GITHUB_TOKEN
+- Test download URL manually in browser
+
+### Local development issues
+- Make sure `.env` file exists with `GITHUB_TOKEN`
+- Run `netlify dev` instead of regular local server
+- Install dependencies with `npm install`
 
 ## Customization
 
+### Change Site Branding
+Edit `index.html:250-252`:
+```html
+<h1>🔒 Your App Name Releases</h1>
+<p>Your custom tagline here</p>
+```
+
 ### Change Colors
-Edit the CSS in `index.html`:
+Edit the CSS gradient in `index.html:16`:
 ```css
 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 ```
 
-### Add More Info
-You can display additional release information by editing the `renderRelease()` function in `app.js`.
+### Support Multiple Apps
+Add more repositories in `netlify/functions/get-releases.js`:
+```javascript
+const REPOSITORIES = [
+    { owner: 'TashiRabten', repo: 'GlossarioBUDA' },
+    { owner: 'TashiRabten', repo: 'AnotherApp' },
+];
+```
 
-### Filter Releases
-Add filtering logic in `fetchReleases()` to only show specific releases (e.g., non-draft, stable versions).
-
-## Usage
-
-Once deployed:
-1. Visit your site URL
-2. All releases from configured repositories will load automatically
-3. Click "Download" on any asset to download it
-4. Share the URL only with people you trust
+For separate auto-update endpoints, duplicate `releases.js` and change the repo.
 
 ## Author
 
