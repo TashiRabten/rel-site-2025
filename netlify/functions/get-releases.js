@@ -71,7 +71,20 @@ exports.handler = async (event, context) => {
                     }
 
                     const releases = await response.json();
-                    return { owner, repo, releases, error: null };
+
+                    // Transform download URLs to use proxy for private repo access
+                    const transformedReleases = releases.map(release => ({
+                        ...release,
+                        assets: release.assets.map(asset => ({
+                            ...asset,
+                            // Store original for reference
+                            original_browser_download_url: asset.browser_download_url,
+                            // Use proxy URL for downloads through our backend
+                            browser_download_url: `https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`
+                        }))
+                    }));
+
+                    return { owner, repo, releases: transformedReleases, error: null };
 
                 } catch (error) {
                     console.error(`Error fetching ${owner}/${repo}:`, error);

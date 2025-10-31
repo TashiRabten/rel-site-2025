@@ -68,43 +68,22 @@ exports.handler = async (event, context) => {
 
         const releases = await response.json();
 
-        // Fetch actual download URLs from GitHub for each asset
-        const transformedReleases = await Promise.all(releases.map(async (release) => {
-            const transformedAssets = await Promise.all(release.assets.map(async (asset) => {
-                try {
-                    // Get the temporary download URL from GitHub
-                    const assetResponse = await fetch(asset.url, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Accept': 'application/octet-stream',
-                            'User-Agent': 'GlossarioBUDA-Updater'
-                        },
-                        redirect: 'manual'
-                    });
-
-                    // GitHub returns a 302 redirect to the actual S3 download URL
-                    const downloadUrl = assetResponse.headers.get('location');
-
-                    return {
-                        ...asset,
-                        // Use the direct S3 URL for downloads
-                        browser_download_url: downloadUrl || asset.browser_download_url,
-                        // Store original GitHub API URL for reference
-                        github_url: asset.url
-                    };
-                } catch (error) {
-                    console.error(`Failed to get download URL for asset ${asset.id}:`, error);
-                    // Fallback to original URL if fetching fails
-                    return asset;
-                }
-            }));
-
+        // Return GitHub API asset URLs - the app will handle authentication
+        // This allows the desktop app to download with its own GitHub token
+        const transformedReleases = releases.map(release => {
             return {
                 ...release,
-                assets: transformedAssets
+                assets: release.assets.map(asset => {
+                    return {
+                        ...asset,
+                        // Use GitHub API URL for downloads - app will add auth headers
+                        browser_download_url: asset.url,
+                        // Keep original browser download URL for reference
+                        github_browser_download_url: asset.browser_download_url
+                    };
+                })
             };
-        }));
+        });
 
         return {
             statusCode: 200,
