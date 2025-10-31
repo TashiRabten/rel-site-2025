@@ -51,6 +51,10 @@ exports.handler = async (event, context) => {
             throw new Error('GITHUB_TOKEN not configured');
         }
 
+        // Check if client wants JSON response (for desktop apps)
+        const acceptHeader = event.headers['accept'] || event.headers['Accept'] || '';
+        const wantsJson = acceptHeader.includes('application/json');
+
         // Fetch the asset metadata from GitHub to get the download URL
         const url = `https://api.github.com/repos/${owner}/${repo}/releases/assets/${assetId}`;
         const response = await fetch(url, {
@@ -67,7 +71,19 @@ exports.handler = async (event, context) => {
         if (response.status === 302 || response.status === 301) {
             const downloadUrl = response.headers.get('location');
             if (downloadUrl) {
-                // Redirect the user to the temporary download URL
+                // If client wants JSON, return the URL as JSON (for desktop apps)
+                if (wantsJson) {
+                    return {
+                        statusCode: 200,
+                        headers: { ...headers, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            url: downloadUrl,
+                            filename: filename
+                        })
+                    };
+                }
+
+                // Otherwise redirect the browser to the download URL
                 return {
                     statusCode: 302,
                     headers: {

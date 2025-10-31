@@ -68,18 +68,21 @@ exports.handler = async (event, context) => {
 
         const releases = await response.json();
 
-        // Return GitHub API asset URLs - the app will handle authentication
-        // This allows the desktop app to download with its own GitHub token
+        // Transform download URLs to go through our proxy
+        // The proxy handles GitHub authentication and returns download URLs
         const transformedReleases = releases.map(release => {
             return {
                 ...release,
                 assets: release.assets.map(asset => {
+                    // Create proxy URL for downloads
+                    const proxyUrl = `https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`;
+
                     return {
                         ...asset,
-                        // Use GitHub API URL for downloads - app will add auth headers
-                        browser_download_url: asset.url,
-                        // Keep original browser download URL for reference
-                        github_browser_download_url: asset.browser_download_url
+                        // Use proxy URL - works for both browser (redirect) and desktop app (JSON)
+                        browser_download_url: proxyUrl,
+                        // Store original GitHub API URL for reference
+                        github_url: asset.url
                     };
                 })
             };
