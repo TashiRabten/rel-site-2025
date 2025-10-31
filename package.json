@@ -1,0 +1,19 @@
+{
+  "name": "private-releases-site",
+  "version": "1.0.0",
+  "description": "Secure private GitHub releases viewer",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "keywords": ["github", "releases", "private", "netlify"],
+  "author": "Tashi Rabten",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

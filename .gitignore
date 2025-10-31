@@ -13,3 +13,15 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+
+# Netlify
+.netlify/

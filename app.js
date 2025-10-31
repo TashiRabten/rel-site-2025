@@ -3,18 +3,11 @@
  * Author: Tashi Rabten
  *
  * This application fetches and displays releases from your private GitHub repositories
+ * Now uses secure backend API - no tokens exposed in frontend!
  */
 
-// 🔒 Your GitHub Personal Access Token
-const GITHUB_TOKEN = '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';
-
-// 📦 Configure your repositories here
-// Add any private repositories you want to display releases from
-const REPOSITORIES = [
-    { owner: 'TashiRabten', repo: 'GlossarioBUDA' },
-    // Add more repositories like:
-    // { owner: 'YourUsername', repo: 'AnotherRepo' },
-];
+// API endpoint for fetching releases (calls your secure backend)
+const API_BASE = '/.netlify/functions';
 
 /**
  * Format file size to human-readable format
@@ -60,53 +53,34 @@ function getFileIcon(filename) {
 }
 
 /**
- * Fetch releases for a specific repository
+ * Fetch all releases from the backend
  */
-async function fetchReleases(owner, repo) {
-    const url = `https://api.github.com/repos/${owner}/${repo}/releases`;
+async function fetchAllReleases() {
+    const url = `${API_BASE}/get-releases`;
 
     try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
+        const response = await fetch(url);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch releases: ${response.status} ${response.statusText}`);
         }
 
-        const releases = await response.json();
-        return { owner, repo, releases, error: null };
+        const allReleases = await response.json();
+        return allReleases;
     } catch (error) {
-        console.error(`Error fetching releases for ${owner}/${repo}:`, error);
-        return { owner, repo, releases: [], error: error.message };
+        console.error('Error fetching releases:', error);
+        throw error;
     }
 }
 
 /**
- * Get download URL for a private asset
- */
-function getAssetDownloadUrl(owner, repo, assetId) {
-    // This creates a special URL that will redirect to the actual download
-    // The token is needed to access private assets
-    return `https://api.github.com/repos/${owner}/${repo}/releases/assets/${assetId}`;
-}
-
-/**
- * Download a private asset
+ * Download a private asset via backend proxy
  */
 async function downloadAsset(owner, repo, assetId, filename) {
-    const url = getAssetDownloadUrl(owner, repo, assetId);
+    const url = `${API_BASE}/download-asset?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}&assetId=${encodeURIComponent(assetId)}&filename=${encodeURIComponent(filename)}`;
 
     try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/octet-stream'
-            }
-        });
+        const response = await fetch(url);
 
         if (!response.ok) {
             throw new Error(`Download failed: ${response.status}`);
@@ -238,10 +212,8 @@ async function loadAllReleases() {
     const contentDiv = document.getElementById('content');
 
     try {
-        // Fetch releases from all configured repositories
-        const allReleases = await Promise.all(
-            REPOSITORIES.map(({ owner, repo }) => fetchReleases(owner, repo))
-        );
+        // Fetch releases from backend
+        const allReleases = await fetchAllReleases();
 
         // Render all repositories
         const html = allReleases.map(renderRepository).join('');
