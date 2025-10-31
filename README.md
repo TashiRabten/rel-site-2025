@@ -22,7 +22,7 @@ A secure web application that makes releases from your **private** GitHub reposi
            │
            ▼
 ┌─────────────────────────────────────────┐
-│  glossariobuda.netlify.app              │
+│  glossariobudacompact.netlify.app              │
 │  ┌────────────────────────────────────┐ │
 │  │ Serverless Functions (Node.js)     │ │
 │  │ - /releases (GitHub-compatible)    │ │
@@ -87,13 +87,13 @@ Once deployed on Netlify, your site provides these public endpoints:
 
 ### 1. GitHub-Compatible Releases API (for app auto-update)
 ```
-GET https://glossariobuda.netlify.app/.netlify/functions/releases
+GET https://glossariobudacompact.netlify.app/.netlify/functions/releases
 ```
 Returns releases in GitHub API format. Use this in your app's update checker.
 
 ### 2. Download Asset (public download proxy)
 ```
-GET https://glossariobuda.netlify.app/.netlify/functions/download-asset
+GET https://glossariobudacompact.netlify.app/.netlify/functions/download-asset
     ?owner=TashiRabten
     &repo=GlossarioBUDA
     &assetId=12345
@@ -103,7 +103,7 @@ Proxies downloads from private repo releases.
 
 ### 3. Web UI API (multi-repo)
 ```
-GET https://glossariobuda.netlify.app/.netlify/functions/get-releases
+GET https://glossariobudacompact.netlify.app/.netlify/functions/get-releases
 ```
 Returns releases from all configured repos for the web UI.
 
@@ -118,7 +118,7 @@ const updateURL = 'https://api.github.com/repos/TashiRabten/GlossarioBUDA/releas
 
 **After (works with private repos):**
 ```javascript
-const updateURL = 'https://glossariobuda.netlify.app/.netlify/functions/releases';
+const updateURL = 'https://glossariobudacompact.netlify.app/.netlify/functions/releases';
 ```
 
 The API returns the exact same JSON format as GitHub, so your existing update logic should work without changes. Download URLs are automatically rewritten to use the Netlify proxy.
@@ -145,7 +145,7 @@ The API returns the exact same JSON format as GitHub, so your existing update lo
 
 3. **Configure custom domain** (optional):
    - In Site settings → Domain management
-   - Your current subdomain: `glossariobuda.netlify.app`
+   - Your current subdomain: `glossariobudacompact.netlify.app`
 
 ### Option 2: Netlify CLI
 
@@ -241,8 +241,8 @@ Then on GitHub:
 ### 2. Releases Automatically Become Public
 
 - Your private repo release is now accessible at:
-  - Web UI: `https://glossariobuda.netlify.app/`
-  - API: `https://glossariobuda.netlify.app/.netlify/functions/releases`
+  - Web UI: `https://glossariobudacompact.netlify.app/`
+  - API: `https://glossariobudacompact.netlify.app/.netlify/functions/releases`
 - No need to redeploy the Netlify site
 - No need to do anything else!
 
@@ -264,10 +264,10 @@ Then on GitHub:
 - Check that repository name is correct in serverless functions
 
 ### App not detecting updates
-- Verify app is using new URL: `https://glossariobuda.netlify.app/.netlify/functions/releases`
+- Verify app is using new URL: `https://glossariobudacompact.netlify.app/.netlify/functions/releases`
 - Check app's network requests in developer tools
 - Ensure CORS is working (should be, it's enabled)
-- Test the endpoint manually: `curl https://glossariobuda.netlify.app/.netlify/functions/releases`
+- Test the endpoint manually: `curl https://glossariobudacompact.netlify.app/.netlify/functions/releases`
 
 ### Downloads failing
 - Check that asset IDs are correct

@@ -32,7 +32,7 @@ Simply replace the GitHub API URL with the Netlify API URL:
 
 ```javascript
 // NEW CODE - Use this
-const updateURL = 'https://glossariobuda.netlify.app/.netlify/functions/releases';
+const updateURL = 'https://glossariobudacompact.netlify.app/.netlify/functions/releases';
 
 fetch(updateURL)
   .then(response => response.json())
@@ -60,7 +60,7 @@ Here's a complete example of an update checker that works with the new API:
 
 ```javascript
 const CURRENT_VERSION = '1.0.0'; // Your app's current version
-const UPDATE_CHECK_URL = 'https://glossariobuda.netlify.app/.netlify/functions/releases';
+const UPDATE_CHECK_URL = 'https://glossariobudacompact.netlify.app/.netlify/functions/releases';
 
 async function checkForUpdates() {
   try {
@@ -138,7 +138,7 @@ publish:
 # NEW
 publish:
   provider: generic
-  url: https://glossariobuda.netlify.app/.netlify/functions/releases
+  url: https://glossariobudacompact.netlify.app/.netlify/functions/releases
 ```
 
 Note: You may need to write a custom update provider since `electron-updater` expects specific formats.
@@ -149,7 +149,7 @@ If you've built custom auto-update logic, just change the URL constant:
 
 ```javascript
 // config.js or constants.js
-export const RELEASES_API_URL = 'https://glossariobuda.netlify.app/.netlify/functions/releases';
+export const RELEASES_API_URL = 'https://glossariobudacompact.netlify.app/.netlify/functions/releases';
 ```
 
 ## Testing the Update
@@ -158,7 +158,7 @@ export const RELEASES_API_URL = 'https://glossariobuda.netlify.app/.netlify/func
 
 Open this URL in your browser:
 ```
-https://glossariobuda.netlify.app/.netlify/functions/releases
+https://glossariobudacompact.netlify.app/.netlify/functions/releases
 ```
 
 You should see JSON with your releases.
@@ -189,7 +189,7 @@ The Netlify API returns the exact same format as GitHub's API:
         "id": 789012,
         "name": "GlossarioBUDA-1.0.0.exe",
         "size": 52428800,
-        "browser_download_url": "https://glossariobuda.netlify.app/.netlify/functions/download-asset?...",
+        "browser_download_url": "https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?...",
         "download_count": 42
       }
     ]
@@ -203,7 +203,7 @@ If you want to support both old and new versions of your app:
 
 ```javascript
 const UPDATE_URLS = [
-  'https://glossariobuda.netlify.app/.netlify/functions/releases', // Try Netlify first
+  'https://glossariobudacompact.netlify.app/.netlify/functions/releases', // Try Netlify first
   'https://api.github.com/repos/TashiRabten/GlossarioBUDA/releases' // Fallback to GitHub
 ];
 

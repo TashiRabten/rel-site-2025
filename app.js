@@ -80,15 +80,9 @@ async function fetchAllReleases() {
 function downloadAsset(owner, repo, assetId, filename) {
     const url = `${API_BASE}/download-asset?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}&assetId=${encodeURIComponent(assetId)}&filename=${encodeURIComponent(filename)}`;
 
-    // Simply navigate to the URL - the backend will redirect to the download
-    // Using a temporary link avoids navigation issues
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Open the URL in a new window - the backend will redirect to the download
+    // The redirect will trigger the browser's download dialog
+    window.open(url, '_blank');
 }
 
 /**

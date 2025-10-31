@@ -74,7 +74,7 @@ exports.handler = async (event, context) => {
                 ...release,
                 assets: release.assets.map(asset => {
                     // Create proxy URL for downloads
-                    const proxyUrl = `https://glossariobuda.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`;
+                    const proxyUrl = `https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`;
 
                     return {
                         ...asset,
