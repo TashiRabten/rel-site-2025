@@ -75,33 +75,20 @@ async function fetchAllReleases() {
 
 /**
  * Download a private asset via backend proxy
+ * The backend returns a redirect to GitHub's temporary download URL
  */
-async function downloadAsset(owner, repo, assetId, filename) {
+function downloadAsset(owner, repo, assetId, filename) {
     const url = `${API_BASE}/download-asset?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}&assetId=${encodeURIComponent(assetId)}&filename=${encodeURIComponent(filename)}`;
 
-    try {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`Download failed: ${response.status}`);
-        }
-
-        // Create a blob from the response
-        const blob = await response.blob();
-
-        // Create a temporary URL and trigger download
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-        console.error('Download error:', error);
-        alert(`Failed to download ${filename}: ${error.message}`);
-    }
+    // Simply navigate to the URL - the backend will redirect to the download
+    // Using a temporary link avoids navigation issues
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 /**
