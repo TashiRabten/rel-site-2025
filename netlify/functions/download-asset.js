@@ -51,42 +51,52 @@ exports.handler = async (event, context) => {
             throw new Error('GITHUB_TOKEN not configured');
         }
 
-        // Fetch the asset from GitHub
+        // Fetch the asset metadata from GitHub to get the download URL
         const url = `https://api.github.com/repos/${owner}/${repo}/releases/assets/${assetId}`;
         const response = await fetch(url, {
+            method: 'GET',
             headers: {
                 'Authorization': `token ${GITHUB_TOKEN}`,
                 'Accept': 'application/octet-stream',
                 'User-Agent': 'Private-Releases-Site'
-            }
+            },
+            redirect: 'manual'  // Don't follow redirects automatically
         });
 
+        // GitHub returns a 302 redirect to the actual download URL (S3)
+        if (response.status === 302 || response.status === 301) {
+            const downloadUrl = response.headers.get('location');
+            if (downloadUrl) {
+                // Redirect the user to the temporary download URL
+                return {
+                    statusCode: 302,
+                    headers: {
+                        'Location': downloadUrl,
+                        'Cache-Control': 'no-cache'
+                    },
+                    body: ''
+                };
+            }
+        }
+
         if (!response.ok) {
-            console.error(`Failed to download asset: ${response.status}`);
+            console.error(`Failed to get asset download URL: ${response.status}`);
             return {
                 statusCode: response.status,
                 headers: { ...headers, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    error: `Failed to download asset: ${response.status} ${response.statusText}`
+                    error: `Failed to get download URL: ${response.status} ${response.statusText}`
                 })
             };
         }
 
-        // Get the content type and buffer
-        const contentType = response.headers.get('content-type') || 'application/octet-stream';
-        const buffer = await response.buffer();
-
-        // Return the file as base64 for binary data
+        // Fallback: if no redirect, something went wrong
         return {
-            statusCode: 200,
-            headers: {
-                ...headers,
-                'Content-Type': contentType,
-                'Content-Disposition': `attachment; filename="${filename || 'download'}"`,
-                'Content-Length': buffer.length.toString()
-            },
-            body: buffer.toString('base64'),
-            isBase64Encoded: true
+            statusCode: 500,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                error: 'Unable to get download URL from GitHub'
+            })
         };
 
     } catch (error) {
