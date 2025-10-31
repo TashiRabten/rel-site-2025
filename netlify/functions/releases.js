@@ -68,24 +68,43 @@ exports.handler = async (event, context) => {
 
         const releases = await response.json();
 
-        // Transform download URLs to go through our proxy
-        const transformedReleases = releases.map(release => {
-            return {
-                ...release,
-                assets: release.assets.map(asset => {
-                    // Create proxy URL for downloads
-                    const proxyUrl = `https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`;
+        // Fetch actual download URLs from GitHub for each asset
+        const transformedReleases = await Promise.all(releases.map(async (release) => {
+            const transformedAssets = await Promise.all(release.assets.map(async (asset) => {
+                try {
+                    // Get the temporary download URL from GitHub
+                    const assetResponse = await fetch(asset.url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/octet-stream',
+                            'User-Agent': 'GlossarioBUDA-Updater'
+                        },
+                        redirect: 'manual'
+                    });
+
+                    // GitHub returns a 302 redirect to the actual S3 download URL
+                    const downloadUrl = assetResponse.headers.get('location');
 
                     return {
                         ...asset,
-                        // Keep original browser_download_url but add our proxy URL
-                        browser_download_url: proxyUrl,
-                        // Store original URL for reference
+                        // Use the direct S3 URL for downloads
+                        browser_download_url: downloadUrl || asset.browser_download_url,
+                        // Store original GitHub API URL for reference
                         github_url: asset.url
                     };
-                })
+                } catch (error) {
+                    console.error(`Failed to get download URL for asset ${asset.id}:`, error);
+                    // Fallback to original URL if fetching fails
+                    return asset;
+                }
+            }));
+
+            return {
+                ...release,
+                assets: transformedAssets
             };
-        });
+        }));
 
         return {
             statusCode: 200,
