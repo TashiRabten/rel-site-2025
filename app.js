@@ -80,9 +80,9 @@ async function fetchAllReleases() {
 function downloadAsset(owner, repo, assetId, filename) {
     const url = `${API_BASE}/download-asset?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}&assetId=${encodeURIComponent(assetId)}&filename=${encodeURIComponent(filename)}`;
 
-    // Open the URL in a new window - the backend will redirect to the download
-    // The redirect will trigger the browser's download dialog
-    window.open(url, '_blank');
+    // Navigate to the URL - the backend will redirect and the browser will download
+    // This works because the redirect has Content-Disposition: attachment header
+    window.location.href = url;
 }
 
 /**
