@@ -94,11 +94,33 @@ async function collectAssets() {
 
 const EXT = { windows: '.exe', mac: '.pkg' };
 
-/** Newest installer asset for an app (by filename token) on a platform. */
-function findInstaller(assets, app, os) {
+// macOS .pkg files are arch-specific (each bundles its own JRE). When a release
+// carries arch-tagged installers, the page offers one button per arch — browsers
+// can't reliably read a Mac's CPU, so we show both and let the user pick.
+const MAC_ARCHES = [
+    { id: 'arm64',  label: 'Apple Silicon', tokens: ['arm64', 'aarch64'] },
+    { id: 'x86_64', label: 'Intel',         tokens: ['x86_64', 'x64', 'amd64', 'intel'] },
+];
+
+/**
+ * Newest installer asset for an app (by filename token) on a platform.
+ * When archTokens is given (macOS), the filename must also contain one of them.
+ */
+function findInstaller(assets, app, os, archTokens) {
     const ext = EXT[os];
     return assets.find(a => a.lower.endsWith(ext) && a.lower.includes(app.match)
-        && (!app.exclude || !a.lower.includes(app.exclude)));
+        && (!app.exclude || !a.lower.includes(app.exclude))
+        && (!archTokens || archTokens.some(t => a.lower.includes(t))));
+}
+
+/**
+ * Per-arch macOS installers for an app — but only when arch-tagged .pkg files
+ * exist on the release. Returns null otherwise so the caller falls back to a
+ * single generic Mac button (back-compat with un-tagged .pkg names).
+ */
+function macInstallers(assets, app) {
+    const perArch = MAC_ARCHES.map(arch => ({ arch, asset: findInstaller(assets, app, 'mac', arch.tokens) }));
+    return perArch.some(x => x.asset) ? perArch : null;
 }
 
 /** Newest installer asset for a given bundle + platform. */
@@ -113,11 +135,11 @@ function osLabel(os) { return os === 'windows' ? 'Windows' : 'Mac'; }
 function osIcon(os) { return os === 'windows' ? '🪟' : '🍎'; }
 
 /** A download button (or a disabled placeholder when the asset is missing). */
-function button(asset, os, { secondary = false, recommended = false } = {}) {
+function button(asset, os, { secondary = false, recommended = false, archLabel = null } = {}) {
     const cls = ['dl'];
     if (secondary) cls.push('secondary');
     if (recommended) cls.push('recommended');
-    const label = `${osLabel(os)}`;
+    const label = archLabel ? `${osLabel(os)} · ${archLabel}` : `${osLabel(os)}`;
     if (!asset) {
         return `<a class="${cls.join(' ')}" aria-disabled="true" title="Ainda não publicado">
                   <span class="os">${osIcon(os)}</span> ${label} · indisponível</a>`;
@@ -130,11 +152,24 @@ function renderApps(assets) {
     const el = document.getElementById('apps');
     el.innerHTML = APPS.map(a => {
         const win = findInstaller(assets, a, 'windows');
-        const mac = findInstaller(assets, a, 'mac');
         const winFirst = OS !== 'mac';
         const w = button(win, 'windows', { secondary: !winFirst, recommended: a.primary && OS === 'windows' });
-        const m = button(mac, 'mac', { secondary: winFirst, recommended: a.primary && OS === 'mac' });
-        const ref = OS === 'mac' ? mac : win;
+
+        // macOS: one button per arch when arch-tagged .pkg files exist on the
+        // release, else a single generic Mac button (back-compat).
+        const perArch = macInstallers(assets, a);
+        let m, macRef;
+        if (perArch) {
+            m = perArch.map(({ arch, asset }) =>
+                button(asset, 'mac', { secondary: winFirst, archLabel: arch.label })).join('');
+            macRef = (perArch.find(x => x.asset) || {}).asset;
+        } else {
+            const mac = findInstaller(assets, a, 'mac');
+            m = button(mac, 'mac', { secondary: winFirst, recommended: a.primary && OS === 'mac' });
+            macRef = mac;
+        }
+
+        const ref = OS === 'mac' ? macRef : win;
         const ver = ref && ref.tag
             ? `<div class="meta">Versão ${ref.tag.replace(/^[a-zA-Z-]*v?/, 'v')}</div>` : '';
         return `
