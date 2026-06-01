@@ -1,259 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Repository Releases</title>
+    <title>TradutorBUDA — Download</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --blue: #2A7AE4;
+            --blue-dark: #1E5AA8;
+            --ink: #1f2733;
+            --muted: #6b7480;
+            --line: #e4e9f0;
+            --bg: #eef2f8;
+            --saffron: #e0922b;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
         }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px 60px; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
+        .hero {
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
-            padding: 40px 20px;
+            color: #fff;
+            background: linear-gradient(135deg, #2A7AE4 0%, #4a2f8f 100%);
+            margin: 0 -20px 36px;
+            padding: 52px 20px 44px;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 8px 30px rgba(42,122,228,.25);
+        }
+        .hero .lotus { font-size: 2.6rem; line-height: 1; opacity: .95; }
+        .hero h1 { font-size: 2.5rem; margin: 8px 0 4px; letter-spacing: -.5px; }
+        .hero .tagline { font-size: 1.08rem; opacity: .9; }
+
+        h2 { font-size: 1.35rem; margin-bottom: 6px; }
+        .section-title { text-align: center; margin: 8px 0 4px; }
+        .muted { color: var(--muted); font-size: .96rem; }
+        .muted.center { text-align: center; max-width: 640px; margin: 0 auto 24px; }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 26px 28px;
+            margin-bottom: 34px;
+            box-shadow: 0 4px 18px rgba(20,40,80,.05);
+        }
+        .app-card .muted { margin: 6px 0 18px; max-width: 620px; }
+
+        .btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
+        .version { color: var(--muted); font-size: .85rem; margin-top: 12px; }
+
+        .dl {
+            display: inline-flex; align-items: center; gap: 9px;
+            background: var(--blue); color: #fff; text-decoration: none;
+            font-weight: 600; font-size: .98rem;
+            padding: 12px 22px; border-radius: 10px;
+            border: 1px solid var(--blue-dark);
+            transition: transform .12s, box-shadow .12s, background .12s;
+        }
+        .dl:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(42,122,228,.35); }
+        .dl .os { font-size: 1.1rem; }
+        .dl.secondary { background: #fff; color: var(--blue); }
+        .dl.secondary:hover { background: #f3f7fe; }
+        .dl.recommended { box-shadow: 0 0 0 3px rgba(42,122,228,.18); }
+        .dl[aria-disabled="true"] {
+            background: #eef1f5; color: #9aa3ad; border-color: var(--line);
+            pointer-events: none; box-shadow: none;
         }
 
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        .bundle-grid {
+            display: grid; gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
         }
-
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .bundle {
+            background: #fff; border: 1px solid var(--line); border-radius: 16px;
+            padding: 24px 22px 22px; display: flex; flex-direction: column;
+            box-shadow: 0 4px 18px rgba(20,40,80,.05);
+            position: relative; overflow: hidden;
         }
-
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 1.2rem;
-            padding: 40px;
+        .bundle.soon { opacity: .72; background: #fafbfc; }
+        .bundle .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+        .bundle h3 { font-size: 1.22rem; }
+        .badge {
+            font-size: .68rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .04em; padding: 4px 9px; border-radius: 20px; white-space: nowrap;
         }
+        .badge.req { background: #fdf0db; color: var(--saffron); }
+        .badge.add { background: #e8f1fd; color: var(--blue); }
+        .badge.soon { background: #eceff3; color: #8a929c; }
+        .bundle .summary { color: var(--muted); font-size: .92rem; margin: 6px 0 12px; }
+        .bundle .meta { font-size: .82rem; color: var(--muted); margin-bottom: 4px; }
+        .bundle .meta b { color: var(--ink); font-weight: 600; }
+        .bundle .models { list-style: none; margin: 10px 0 16px; font-size: .84rem; }
+        .bundle .models li { padding: 3px 0 3px 18px; position: relative; color: #46505c; }
+        .bundle .models li::before { content: "›"; position: absolute; left: 4px; color: var(--blue); font-weight: 700; }
+        .bundle .actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+        .bundle .actions .dl { padding: 9px 16px; font-size: .9rem; }
 
-        .error {
-            background: #ff6b6b;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-        }
+        .loading { color: var(--muted); padding: 18px 0; }
+        .err { background: #fdecec; color: #b3261e; border-radius: 10px; padding: 14px 16px; }
 
-        .repo-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+        footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 18px; }
+        footer a { color: var(--blue); text-decoration: none; }
 
-        .repo-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .repo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .repo-info h2 {
-            font-size: 1.8rem;
-            color: #2d3748;
-            margin-bottom: 5px;
-        }
-
-        .repo-info p {
-            color: #718096;
-            font-size: 0.95rem;
-        }
-
-        .release {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .release:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .release-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-
-        .release-title {
-            flex: 1;
-        }
-
-        .release-title h3 {
-            font-size: 1.5rem;
-            color: #2d3748;
-            margin-bottom: 8px;
-        }
-
-        .release-meta {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            background: #667eea;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .date {
-            color: #718096;
-            font-size: 0.9rem;
-        }
-
-        .release-body {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-        }
-
-        .assets {
-            margin-top: 20px;
-        }
-
-        .assets-title {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 12px;
-            font-size: 1rem;
-        }
-
-        .asset {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .asset-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .asset-icon {
-            font-size: 1.5rem;
-        }
-
-        .asset-name {
-            font-weight: 500;
-            color: #2d3748;
-        }
-
-        .asset-size {
-            color: #718096;
-            font-size: 0.85rem;
-        }
-
-        .download-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-block;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .no-releases {
-            text-align: center;
-            color: #718096;
-            padding: 40px;
-            font-size: 1.1rem;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
-
-            .repo-section {
-                padding: 20px;
-            }
-
-            .release {
-                padding: 20px;
-            }
-
-            .asset {
-                flex-direction: column;
-                align-items: start;
-                gap: 10px;
-            }
+        @media (max-width: 620px) {
+            .hero h1 { font-size: 2rem; }
+            .card { padding: 22px 18px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🔒 Private Repository Releases</h1>
-            <p>Secure access to your latest releases</p>
+    <div class="wrap">
+        <header class="hero">
+            <div class="lotus">☸</div>
+            <h1>TradutorBUDA</h1>
+            <p class="tagline">Tradutor de tibetano com inteligência artificial</p>
         </header>
 
-        <div id="content">
-            <div class="loading">Loading releases...</div>
-        </div>
+        <section>
+            <h2 class="section-title">1 · Baixe os aplicativos</h2>
+            <p class="muted center">O instalador de cada aplicativo contém <b>apenas o programa</b>.
+                Os modelos de IA do TradutorBUDA são baixados à parte (passo 2 abaixo).</p>
+            <div id="apps" class="bundle-grid"><div class="loading">Carregando…</div></div>
+        </section>
+
+        <section>
+            <h2 class="section-title">2 · Escolha os pacotes de modelos</h2>
+            <p class="muted center">Os pacotes são <b>aditivos</b>: instale o <b>Essencial</b> primeiro e
+                adicione os demais conforme precisar. Cada instalador adiciona apenas os seus modelos —
+                não é preciso reinstalar o aplicativo.</p>
+            <div id="bundles" class="bundle-grid"><div class="loading">Carregando pacotes…</div></div>
+        </section>
+
+        <footer>
+            <p>Modelos cedidos por BDRC, projeto Dharmamitra, KoichiYasuoka e o Classical Tibetan Corpus.
+               &nbsp;·&nbsp; <a href="https://github.com/TashiRabten/TradutorBUDA" target="_blank" rel="noopener">GitHub</a></p>
+        </footer>
     </div>
 
     <script src="app.js"></script>
