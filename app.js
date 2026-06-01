@@ -55,6 +55,17 @@ const APPS = [
       summary: 'Motor de OCR tibetano local (opcional — o TradutorBUDA usa OCR remoto por padrão).' },
 ];
 
+// The glossary database (~2.4 GB) ships as an INSTALLER (DadosBUDA), not a raw
+// file download: it overwrites glossario_terms.db in place inside the canonical
+// ~/Documents/glossariobuda folder — a plain download can't replace it there.
+// Data-only, so a single .pkg serves both Macs. Discovered by the 'dadosbuda' token.
+const DATA = {
+    name: 'DadosBUDA',
+    match: 'dadosbuda',
+    sizeMb: 2400,
+    summary: 'Banco de dados do glossário budista. Instala e substitui o glossario_terms.db na pasta glossariobuda — usado pelo TradutorBUDA e pelo GlossárioBUDA.',
+};
+
 const OS = detectOS();
 
 function detectOS() {
@@ -217,15 +228,47 @@ function renderBundles(assets) {
     }).join('');
 }
 
+/** The glossary-database installer (DadosBUDA) — overwrites the DB in place. */
+function findData(assets, os) {
+    return assets.find(a => a.lower.endsWith(EXT[os]) && a.lower.includes(DATA.match));
+}
+
+function renderData(assets) {
+    const el = document.getElementById('data');
+    if (!el) return;
+    const win = findData(assets, 'windows');
+    const mac = findData(assets, 'mac');
+    const winFirst = OS !== 'mac';
+    const w = button(win, 'windows', { secondary: !winFirst });
+    const m = button(mac, 'mac', { secondary: winFirst });
+    const ref = OS === 'mac' ? mac : win;
+    const ver = ref && ref.tag
+        ? `<div class="meta">Versão ${ref.tag.replace(/^[a-zA-Z-]*v?/, 'v')}</div>` : '';
+    el.innerHTML = `
+        <div class="bundle">
+            <div class="top">
+                <h3>${DATA.name}</h3>
+                <span class="badge req">Necessário</span>
+            </div>
+            <div class="summary">${DATA.summary}</div>
+            <div class="meta"><b>~${fmtSize(DATA.sizeMb)}</b> para baixar</div>
+            <div class="meta">Substitui o banco em <b>Documentos/glossariobuda</b></div>
+            ${ver}
+            <div class="actions">${winFirst ? w + m : m + w}</div>
+        </div>`;
+}
+
 async function load() {
     try {
         const assets = await collectAssets();
         renderApps(assets);
+        renderData(assets);
         renderBundles(assets);
     } catch (e) {
         console.error(e);
         const msg = `<div class="err">Não foi possível carregar os downloads: ${e.message}</div>`;
         document.getElementById('apps').innerHTML = msg;
+        const dataEl = document.getElementById('data'); if (dataEl) dataEl.innerHTML = '';
         document.getElementById('bundles').innerHTML = '';
     }
 }
