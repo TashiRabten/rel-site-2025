@@ -117,27 +117,9 @@ exports.handler = async (event, context) => {
 
         const releases = await response.json();
 
-        // Only expose releases that carry a platform installer (.exe/.pkg/.dmg).
-        // The build pipeline also publishes asset-only releases to this repo
-        // (tesseract-portable-v1, *-models-v1, dadosbuda-db-v1) that ship .tar.gz/.zip.
-        // Those must NOT reach the desktop auto-updaters: each updater picks the FIRST
-        // release for its branch, and a non-version tag like "tesseract-portable-v1"
-        // makes it fail with "Invalid version format". Real app releases (incl. SegBUDA)
-        // always include an .exe/.pkg, so this keeps them and drops the asset bundles.
-        const INSTALLER_RE = /\.(exe|pkg|dmg)$/i;
-        const appReleases = releases
-            .filter(r => Array.isArray(r.assets) && r.assets.some(a => INSTALLER_RE.test(a.name || '')))
-            // SegBUDA bundles are discovered by the 'segbuda-v' tag PREFIX, not by branch,
-            // but they were published on the default branch (compact-version). Move them off
-            // it so the branch-based app updaters (compact-version / tradutor-buda / Namsel)
-            // never pick "segbuda-v1.0.0" as their update. The SegBUDA updater ignores branch.
-            .map(r => /^segbuda-v/i.test(r.tag_name || '')
-                ? { ...r, target_commitish: 'segbuda' }
-                : r);
-
         // Transform download URLs to go through our proxy
         // The proxy handles GitHub authentication and returns download URLs
-        const transformedReleases = appReleases.map(release => {
+        const transformedReleases = releases.map(release => {
             const assets = release.assets.map(asset => {
                 // Create proxy URL for downloads
                 const proxyUrl = `https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`;
