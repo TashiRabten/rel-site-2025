@@ -8,6 +8,36 @@
 const fetch = require('node-fetch');
 
 /**
+ * Parse a semantic version from a release tag, stripping any app prefix.
+ * Handles: "glossario-v1.4.0", "tradutor-buda-v1.4.8", "namsel-v1.0.0.5",
+ *          "segbuda-v1.2.0", "dadosbuda-v1.0.1", "v1.3.9", "v.1.3.3".
+ * Returns an array of integers, or null if unparseable (sorts last).
+ */
+function parseVersionFromTag(tag) {
+    if (!tag) return null;
+    const stripped = tag.replace(/^[^0-9]+/, '');
+    if (!stripped) return null;
+    const parts = stripped.split('.').map(Number);
+    return parts.some(isNaN) ? null : parts;
+}
+
+/**
+ * Compare two parsed version arrays descending (highest version first).
+ * null versions sort after all real versions.
+ */
+function compareVersionsDesc(a, b) {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+        const diff = (b[i] || 0) - (a[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
+}
+
+/**
  * Sort rank for a macOS .pkg asset, used to order assets so LEGACY desktop
  * updaters (which pick the FIRST .pkg and send no CPU-arch signal) land on the
  * most broadly-runnable build:
@@ -132,6 +162,13 @@ exports.handler = async (event, context) => {
 
             return { ...release, assets };
         });
+
+        // Sort by semantic version descending so each AutoUpdater (which picks the
+        // FIRST release matching its branch) always receives the highest version
+        // first — regardless of when the GitHub tag was created (created_at order).
+        transformedReleases.sort((a, b) =>
+            compareVersionsDesc(parseVersionFromTag(a.tag_name), parseVersionFromTag(b.tag_name))
+        );
 
         return {
             statusCode: 200,
