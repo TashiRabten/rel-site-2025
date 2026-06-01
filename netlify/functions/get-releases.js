@@ -5,6 +5,32 @@
 
 const fetch = require('node-fetch');
 
+/**
+ * Parse a semantic version from a release tag, stripping any app prefix.
+ * Handles: "glossario-v1.4.0", "tradutor-buda-v1.4.8", "namsel-v1.0.0.5",
+ *          "segbuda-v1.2.0", "dadosbuda-v1.0.1", "v1.3.9", "v.1.3.3".
+ * Returns an array of integers, or null if unparseable (sorts last).
+ */
+function parseVersionFromTag(tag) {
+    if (!tag) return null;
+    const stripped = tag.replace(/^[^0-9]+/, '');
+    if (!stripped) return null;
+    const parts = stripped.split('.').map(Number);
+    return parts.some(isNaN) ? null : parts;
+}
+
+function compareVersionsDesc(a, b) {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+        const diff = (b[i] || 0) - (a[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
+}
+
 // Configure your repositories here
 const REPOSITORIES = [
     { owner: 'TashiRabten', repo: 'GlossarioBUDA' },
@@ -83,6 +109,13 @@ exports.handler = async (event, context) => {
                             browser_download_url: `https://glossariobudacompact.netlify.app/.netlify/functions/download-asset?owner=${owner}&repo=${repo}&assetId=${asset.id}&filename=${encodeURIComponent(asset.name)}`
                         }))
                     }));
+
+                    // Sort by semantic version descending so findInstaller (which picks
+                    // the first matching asset) always gets the highest-version release
+                    // regardless of when the GitHub tag was originally created.
+                    transformedReleases.sort((a, b) =>
+                        compareVersionsDesc(parseVersionFromTag(a.tag_name), parseVersionFromTag(b.tag_name))
+                    );
 
                     return { owner, repo, releases: transformedReleases, error: null };
 
