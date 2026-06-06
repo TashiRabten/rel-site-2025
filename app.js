@@ -45,12 +45,16 @@ const BUNDLES = [
     },
 ];
 
-// Apps published on the GlossarioBUDA releases (discovered by filename token).
+// Apps discovered by filename token across the configured release repos
+// (netlify/functions/get-releases.js REPOSITORIES). Per-arch Mac buttons +
+// Windows button render automatically from arch-tagged filenames.
 const APPS = [
     { id: 'tradutorbuda', name: 'TradutorBUDA', match: 'tradutorbuda', exclude: 'segbuda', primary: true,
       summary: 'Tradutor de tibetano com IA — dicionário, OCR e traduções ranqueadas.' },
     { id: 'glossario', name: 'GlossárioBUDA', match: 'glossario', exclude: 'segbuda',
       summary: 'Glossário e gerenciador de termos budistas multilíngue.' },
+    { id: 'legendasbuda', name: 'LegendasBUDA', match: 'legendasbuda', exclude: null,
+      summary: 'Visualizador de legendas para vídeos do YouTube.' },
     { id: 'namsel', name: 'Namsel OCR', match: 'namsel', exclude: null,
       summary: 'Motor de OCR tibetano local (opcional — o TradutorBUDA usa OCR remoto por padrão).' },
 ];
