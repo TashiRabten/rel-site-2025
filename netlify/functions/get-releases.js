@@ -31,12 +31,10 @@ function compareVersionsDesc(a, b) {
     return 0;
 }
 
-// Configure your repositories here. Assets from every repo are merged client-side
-// and matched by filename token (app.js APPS/BUNDLES), so an app can live in its own
-// repo. LegendasBUDA publishes to its own repo (matching its in-app AutoUpdater).
+// All BUDA app releases live in GlossarioBUDA, distinguished by target_commitish.
+// LegendasBUDA releases use target_commitish == "legendas-buda".
 const REPOSITORIES = [
     { owner: 'TashiRabten', repo: 'GlossarioBUDA' },
-    { owner: 'TashiRabten', repo: 'LegendasBUDA' },
 ];
 
 exports.handler = async (event, context) => {
