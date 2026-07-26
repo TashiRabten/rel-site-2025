@@ -76,7 +76,7 @@ exports.handler = async (event, context) => {
         const allReleases = await Promise.all(
             REPOSITORIES.map(async ({ owner, repo }) => {
                 try {
-                    const url = `https://api.github.com/repos/${owner}/${repo}/releases`;
+                    const url = `https://api.github.com/repos/${owner}/${repo}/releases?per_page=100`;
                     const response = await fetch(url, {
                         headers: {
                             'Authorization': `token ${GITHUB_TOKEN}`,
