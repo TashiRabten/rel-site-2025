@@ -14,3 +14,10 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer"
     X-XSS-Protection = "1; mode=block"
+
+# The app's "Manual do Usuário" button opens /manual/tradutorbuda/ (update/UserManual.URL in TradutorBUDA), so installed
+# versions keep working whatever the manual's file is called. Status 200 serves the file at the short address.
+[[redirects]]
+  from = "/manual/tradutorbuda/"
+  to = "/manual/tradutorbuda/Manual_do_Usu%C3%A1rio.html"
+  status = 200

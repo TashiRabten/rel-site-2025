@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual do TradutorBUDA</title>
+<meta name="description" content="Referência rápida das funções do TradutorBUDA: análise, cartões, glossário, caderno, ortografia, IA, OCR e áudio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tibetan:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F5DC;
+    --surface: #FFFDF4;
+    --ink: #2C3E50;
+    --muted: #5B6B7A;
+    --navy: #1E375A;
+    --accent: #3F6A96;
+    --accent-soft: #DCE6F1;
+    --gold: #BFAF7C;
+    --line: #E2DCC2;
+    --kbd-bg: #EFEBD6;
+    --head-ink: #FFFFFF;
+    --shadow: 0 2px 10px rgba(30, 55, 90, .07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161D26;
+      --surface: #1F2935;
+      --ink: #E6E3D6;
+      --muted: #A3AFBC;
+      --navy: #0F1E31;
+      --accent: #9DBBE0;
+      --accent-soft: #263A52;
+      --gold: #CDBE8A;
+      --line: #313E4D;
+      --kbd-bg: #2A3644;
+      --head-ink: #F3F1E7;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161D26;
+    --surface: #1F2935;
+    --ink: #E6E3D6;
+    --muted: #A3AFBC;
+    --navy: #0F1E31;
+    --accent: #9DBBE0;
+    --accent-soft: #263A52;
+    --gold: #CDBE8A;
+    --line: #313E4D;
+    --kbd-bg: #2A3644;
+    --head-ink: #F3F1E7;
+    --shadow: 0 2px 10px rgba(0, 0, 0, .3);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .bo { font-family: "Noto Serif Tibetan", "Microsoft Himalaya", "Jomolhari", serif; font-size: 1.15em; line-height: 1; }
+
+  header.top {
+    background: var(--navy);
+    color: var(--head-ink);
+    padding: 36px 16px 30px;
+    border-bottom: 4px solid var(--gold);
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  header.top .wrap { padding: 0; }
+  header.top .mark { font-size: 2.2rem; opacity: .9; }
+  header.top h1 { margin: 4px 0 6px; font-size: 2rem; letter-spacing: -.3px; line-height: 1.2; }
+  header.top p { margin: 0; opacity: .85; max-width: 620px; }
+
+  main { padding: 28px 0 56px; }
+
+  nav#indice {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 22px 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+  }
+  nav#indice h2 { margin: 0 0 8px; font-size: 1.15rem; border: 0; padding: 0; }
+  nav#indice ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+  nav#indice li { break-inside: avoid; padding: 2px 0; }
+  @media (max-width: 600px) { nav#indice ol { columns: 1; } }
+
+  a { color: var(--accent); }
+  a:hover { text-decoration-thickness: 2px; }
+
+  section {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 22px 16px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  h2, h3 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  h2 {
+    font-size: 1.3rem;
+    margin: 14px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-soft);
+  }
+  h3 { font-size: 1.04rem; margin: 18px 0 6px; color: var(--accent); }
+  h2 .num { color: var(--gold); margin-right: 6px; }
+  a.voltar {
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 1px 10px;
+  }
+  a.voltar:hover { color: var(--accent); border-color: var(--accent); }
+
+  p { margin: 6px 0 10px; }
+  ul { margin: 6px 0 10px; padding-left: 20px; }
+  li { margin: 3px 0; }
+  dl { margin: 6px 0 10px; }
+  dt { font-weight: 600; margin-top: 8px; }
+  dd { margin: 1px 0 0 0; color: var(--ink); }
+  .muted { color: var(--muted); }
+  .ui { font-weight: 600; }
+  kbd {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: .82em;
+    background: var(--kbd-bg);
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 0 5px;
+    white-space: nowrap;
+  }
+  code {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: .88em;
+    background: var(--kbd-bg);
+    border-radius: 4px;
+    padding: 0 4px;
+  }
+  .tbl { overflow-x: auto; margin: 8px 0 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  td:first-child { min-width: 9em; }
+  .note {
+    border-left: 3px solid var(--gold);
+    background: var(--accent-soft);
+    padding: 8px 12px;
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0;
+    font-size: .95rem;
+  }
+  footer { color: var(--muted); font-size: .88rem; text-align: center; padding: 0 16px 40px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="mark bo" aria-hidden="true">ༀ</div>
+    <h1>Manual do TradutorBUDA</h1>
+    <p>Referência rápida das funções, para quem já traduz do tibetano, do sânscrito e do chinês.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<nav id="indice" aria-label="Índice">
+  <h2>Índice</h2>
+  <ol>
+    <li><a href="#primeiros-passos">Primeiros passos</a></li>
+    <li><a href="#barra">Barra de ferramentas</a></li>
+    <li><a href="#editor">Editor</a></li>
+    <li><a href="#menu-contexto">Menu de contexto</a></li>
+    <li><a href="#sugerir">Sugerir Traduções</a></li>
+    <li><a href="#cartoes">Cartões de tradução</a></li>
+    <li><a href="#morfologia">Morfologia — com e sem IA</a></li>
+    <li><a href="#modelo">Modelo de ranqueamento e Modo Editor</a></li>
+    <li><a href="#glossario">Glossário</a></li>
+    <li><a href="#sincronizacao">Sincronização: tempo real, baseline e delta</a></li>
+    <li><a href="#caderno">Caderno de Tradução</a></li>
+    <li><a href="#ortografia">Ortografia e correção automática</a></li>
+    <li><a href="#ia">IA</a></li>
+    <li><a href="#conversa">Conversa com a IA</a></li>
+    <li><a href="#dharmamitra">Dharmamitra</a></li>
+    <li><a href="#ocr">OCR e captura de texto</a></li>
+    <li><a href="#audio">Áudio e legendas ao vivo</a></li>
+    <li><a href="#escolhas">Registro de escolhas</a></li>
+    <li><a href="#atualizacoes">Atualizações</a></li>
+    <li><a href="#atalhos">Atalhos de teclado</a></li>
+  </ol>
+</nav>
+
+<section id="primeiros-passos">
+  <h2><span><span class="num">1</span>Primeiros passos</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>Instalação:</b> baixe o instalador (Windows <code>.exe</code> ou macOS <code>.pkg</code>) no <a href="/">site de download</a>.</li>
+    <li><b>Pacotes de modelos (SegBUDA):</b> instalados à parte, sem reinstalar o app — <b>Essencial</b> (ranqueamento das traduções), <b>Segmentação</b> e <b>Áudio</b> (transcrição). O app avisa na abertura quando o Essencial falta.</li>
+    <li><b>Modo Tradutor e Modo Editor:</b> o Tradutor carrega modelos e índices para a análise completa; o Editor é leve, só edição e glossário. Troca pelo <a href="#modelo">botão do modelo</a>.</li>
+    <li><b>Várias janelas:</b> abrir o app de novo oferece uma nova janela no mesmo processo. As janelas compartilham glossário e modelos.</li>
+  </ul>
+</section>
+
+<section id="barra">
+  <h2><span><span class="num">2</span>Barra de ferramentas</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <dl>
+    <dt>Sugerir Traduções ▾</dt>
+    <dd>Analisa o texto. A seta escolhe os idiomas-alvo e liga <span class="ui">Segmentar</span>. Ver <a href="#sugerir">Sugerir Traduções</a>.</dd>
+    <dt>Atualizar BD</dt>
+    <dd>Recarrega o glossário.</dd>
+    <dt>Tirar Espaços</dt>
+    <dd>Remove espaços entre sílabas tibetanas (texto colado de PDF).</dd>
+    <dt>OCR · Local/Remoto</dt>
+    <dd>Reconhecimento de texto em imagem ou tela. Ver <a href="#ocr">OCR</a>.</dd>
+    <dt>Áudio</dt>
+    <dd>Transcrição de arquivo e legendas ao vivo. Ver <a href="#audio">Áudio</a>.</dd>
+    <dt>Tamanho da fonte</dt>
+    <dd>Aceita valores decimais digitados.</dd>
+    <dt>Botão do modelo (ex.: NLLB v7)</dt>
+    <dd>Modelo que ordena os cartões e troca para o Modo Editor. Ver <a href="#modelo">Modelo</a>.</dd>
+    <dt>IA ▼</dt>
+    <dd>Tradução e análise por IA, NLLB e Dharmamitra. Ver <a href="#ia">IA</a>.</dd>
+  </dl>
+</section>
+
+<section id="editor">
+  <h2><span><span class="num">3</span>Editor</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>Escritas:</b> tibetano, devanágari, IAST, português, inglês e chinês no mesmo texto; cada escrita recebe a fonte certa automaticamente.</li>
+    <li><b>Formatação:</b> <kbd>Ctrl+B</kbd> <kbd>Ctrl+I</kbd> <kbd>Ctrl+U</kbd>, recuo <kbd>Ctrl+M</kbd>, listas e títulos. Mais opções em <a href="#menu-contexto">Formatação</a> no menu de contexto.</li>
+    <li><b>Markdown:</b> <span class="ui">Renderizar / Converter Markdown</span> (<kbd>Ctrl+Shift+M</kbd>) converte negrito, títulos, código, citações e tabelas em formatação real — e de volta. Vale para a seleção ou o documento todo.</li>
+    <li><b>Páginas:</b> o documento é paginado. A barra de páginas fica embaixo, na linha do caderno: <span class="ui">▲</span> comanda o documento, <span class="ui">▼</span> o caderno, <span class="ui">+</span> cria página; clique no número para saltar. <kbd>Ctrl+Shift+A</kbd> junta as páginas e seleciona o documento inteiro.</li>
+    <li><b>Busca 🔍</b> (na mesma linha): <kbd>Enter</kbd> próxima, <kbd>Shift+Enter</kbd> anterior, <kbd>Esc</kbd> fecha. Opções: todas as páginas, palavra inteira.</li>
+    <li><b>Desfazer / Refazer:</b> <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> (ou <kbd>Ctrl+Shift+Z</kbd>).</li>
+  </ul>
+</section>
+
+<section id="menu-contexto">
+  <h2><span><span class="num">4</span>Menu de contexto</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <p>Botão direito no editor abre um painel em seções:</p>
+  <dl>
+    <dt>Ações rápidas</dt>
+    <dd>Desfazer, Refazer, Recortar, Copiar, Colar, Excluir.</dd>
+    <dt>Dicionário</dt>
+    <dd>Adicionar, editar e consultar termos; termos similares. Ver <a href="#glossario">Glossário</a>.</dd>
+    <dt>Tradução</dt>
+    <dd>Multilíngue, Sinônimos, Analisar seleção, Enviar ao caderno, Converter escrita (<span class="ui">Tibetano → Wylie</span>, <span class="ui">IAST → Devanágari</span>, <span class="ui">Devanágari → IAST</span>) e as opções do <a href="#escolhas">registro de escolhas</a>.</dd>
+    <dt>Formatação · Caso</dt>
+    <dd>Negrito, itálico, sublinhado; <span class="ui">Caso</span> troca maiúsculas e minúsculas da seleção ou da palavra do cursor; Renderizar Markdown.</dd>
+    <dt>Tabela</dt>
+    <dd>Adicionar ou remover linhas e colunas.</dd>
+    <dt>Ortografia</dt>
+    <dd>Aparece numa palavra marcada. Ver <a href="#ortografia">Ortografia</a>.</dd>
+    <dt>Rodapé</dt>
+    <dd>Selecionar página, Selecionar tudo, Consultar diacrítico, e a contagem de palavras.</dd>
+  </dl>
+</section>
+
+<section id="sugerir">
+  <h2><span><span class="num">5</span>Sugerir Traduções</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>Clique:</b> segmenta o texto, consulta o glossário e torna os termos clicáveis. Para só um trecho, use <span class="ui">Analisar Seleção</span> (<kbd>Ctrl+Shift+E</kbd>).</li>
+    <li><b>▾ Idiomas-alvo:</b> os cartões mostram só os idiomas marcados (português, inglês, sânscrito, devanágari, páli, chinês, tibetano).</li>
+    <li><b>Segmentar:</b> divide compostos sânscritos.</li>
+    <li><b>Partículas:</b> o termo é lido sem a partícula e o caso aparece junto — <span class="bo">སངས་རྒྱས་ཀྱིས</span> = <span class="bo">སངས་རྒྱས</span> + <span class="bo">ཀྱིས</span> (instrumental).</li>
+    <li><b>Verbos auxiliares</b> em fim de frase (<span class="bo">ཡིན</span>, <span class="bo">མིན</span>, <span class="bo">བྱུང</span>…) ganham um cartão de gramática no topo: <code>[COP]</code>, <code>[NEG]</code>, <code>[PAST]</code>…</li>
+    <li>Clique num termo para abrir os <a href="#cartoes">cartões</a> no painel de baixo.</li>
+  </ul>
+</section>
+
+<section id="cartoes">
+  <h2><span><span class="num">6</span>Cartões de tradução</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>Ordem:</b> o modelo ordena as entradas do glossário pelo contexto da frase. A porcentagem é a confiança, quando calibrada.</li>
+    <li><b>Escolher um cartão:</b> leva a tradução à prévia da frase. A escolha vale só para aquela ocorrência.</li>
+    <li><b>Outras traduções (N) ▼:</b> o restante, incluindo entradas de várias palavras.</li>
+    <li><b>Ver forma completa ▼:</b> a palavra com a partícula, quando existe como entrada própria.</li>
+    <li><b>Ver leitura separada ▼:</b> um auxiliar lido inteiro oferece a leitura separada — <span class="bo">ཡིན</span> também como <span class="bo">ཡི</span> + <span class="bo">ན</span>.</li>
+    <li><b>Ver termo composto ▼:</b> em texto de escrita latina, o composto inteiro como entrada própria.</li>
+    <li><b>Abreviaturas, referências e mídia:</b> quando o glossário as tem — referências 84000 e FGDB, 📄 PDF, 🔊 áudio.</li>
+    <li><b>IA:</b> <span class="ui">Por que esta tradução?</span> e <span class="ui">Ajude-me a escolher</span>.</li>
+    <li><b>Enviar ao caderno:</b> guarda o termo e a escolha no <a href="#caderno">Caderno de Tradução</a>.</li>
+  </ul>
+</section>
+
+<section id="morfologia">
+  <h2><span><span class="num">7</span>Morfologia — com e sem IA</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <p>A linha <span class="ui">Morfologia:</span> aparece no cabeçalho do termo, na forma completa e no composto.</p>
+  <h3><span>Sem IA (no seu computador)</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li><b>Tibetano:</b> modelo UPOS local — classe gramatical e caso de cada partícula, na tabela tradicional dos casos: instrumental (<span class="bo">ཀྱིས</span>…), genitivo (<span class="bo">ཀྱི</span>…), terminativo — acus./dat./loc. (<span class="bo">སུ ར རུ དུ ཏུ ལ ན</span>), ablativo (<span class="bo">ནས ལས</span>), comitativo (<span class="bo">དང</span>). Sem o modelo, valem as regras de partícula do app.</li>
+    <li><b>Sânscrito:</b> modelo ByT5 local — desfaz sandhi e compostos (com <span class="ui">Segmentar</span>), dá o lema e a morfologia.</li>
+    <li><b>Páli e chinês:</b> vêm da própria entrada do glossário — gênero, raiz e formação (páli); romanização, classe e domínio (chinês).</li>
+    <li><b>Verbos auxiliares:</b> o cartão de gramática (<code>[COP]</code>, <code>[NEG]</code>, <code>[PAST]</code>…).</li>
+  </ul>
+  <h3><span>Com IA</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li><span class="ui">IA ▼ ▸ Opções de IA ▸ Morfologia por IA nos termos</span>: a leitura da <a href="#dharmamitra">Dharmamitra</a> aparece ao lado da do app, marcada <span class="ui">Gerado por IA:</span> — sandhi desfeito (<i>anutpannā</i> → <i>an</i> + <i>utpad</i>), caso, gênero e número, e o sentido no contexto. Vem em inglês, que é como o serviço responde. Usa só uma vaga livre do limite de pedidos, fica em cache por termo e nunca altera a leitura do app.</li>
+    <li>Em palavras em inglês ou português, a mesma leitura dá o sânscrito que a palavra traduz, o sentido e quantas vezes aparece no corpus (ex.: <i>śūnyatā</i>).</li>
+    <li><span class="ui">IA ▼ ▸ Analisar ▸ Análise gramatical…</span>: a gramática da seleção pela IA escolhida.</li>
+  </ul>
+</section>
+
+<section id="modelo">
+  <h2><span><span class="num">8</span>Modelo de ranqueamento e Modo Editor</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li>O botão do modelo lista os ranqueadores instalados: <b>mBERT</b> (sempre presente), <b>NLLB v7</b>, <b>ModernBERT</b>, <b>DhaMi</b>.</li>
+    <li><b>Editor:</b> descarrega modelos e índices (pouca memória). A consulta ao glossário continua, mais restrita; a análise fica desligada.</li>
+    <li><b>Modo Tradutor:</b> carrega tudo de novo.</li>
+  </ul>
+</section>
+
+<section id="glossario">
+  <h2><span><span class="num">9</span>Glossário</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <dl>
+    <dt>Adicionar termo — <kbd>Ctrl+Shift+N</kbd></dt>
+    <dd>Nova entrada a partir da seleção.</dd>
+    <dt>Editar termo — <kbd>Ctrl+Shift+R</kbd></dt>
+    <dd>Edita as entradas do termo selecionado.</dd>
+    <dt>Consultar termos — <kbd>Ctrl+Shift+D</kbd></dt>
+    <dd>Busca no glossário; edita ou apaga a partir dos resultados.</dd>
+    <dt>Termos similares</dt>
+    <dd>Entradas próximas do termo selecionado.</dd>
+    <dt>Tradução multilíngue — <kbd>Ctrl+Shift+L</kbd> · Sinônimos</dt>
+    <dd>Inserem no texto, entre parênteses, as traduções do termo nos idiomas escolhidos, ou os seus sinônimos. Com <span class="ui">Escolher entre opções</span>, abre um menu em cada idioma que tem mais de uma tradução.</dd>
+    <dt>Consultar diacrítico</dt>
+    <dd>As grafias da palavra no glossário e o que distingue cada uma (ex.: <i>śīla, sīla, śilā</i>).</dd>
+    <dt>Sincronização</dt>
+    <dd>Cada edição vai para a nuvem e chega às outras máquinas em segundos. Ver <a href="#sincronizacao">Sincronização</a>.</dd>
+  </dl>
+</section>
+
+<section id="sincronizacao">
+  <h2><span><span class="num">10</span>Sincronização: tempo real, baseline e delta</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <h3><span>Como o glossário é distribuído</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li><b>Baseline:</b> o instalador <b>DadosBUDA</b> traz o glossário inteiro até uma data de corte — o arquivo <code>glossario_terms.db</code> em <b>Documentos/glossariobuda</b>, o mesmo que o GlossárioBUDA usa.</li>
+    <li><b>Delta:</b> a nuvem guarda só o que mudou depois do corte — termos adicionados e editados, e o registro de cada exclusão.</li>
+    <li>Cada app baixa o delta a partir do corte e, depois, só o que é novo desde a última vez.</li>
+  </ul>
+  <h3><span>Tempo real</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>Uma edição feita aqui sobe na hora. Sem conexão, entra na fila offline e sobe quando a conexão volta.</li>
+    <li>O app fica ouvindo a nuvem, como o GlossárioBUDA: o que outra máquina muda chega em um ou dois segundos e já vale na próxima busca e na próxima análise, sem reiniciar.</li>
+    <li>Se a conexão cai, o app reconecta sozinho e busca o que perdeu. Além disso, confere a nuvem a cada minuto.</li>
+    <li>O que o GlossárioBUDA grava neste computador (no mesmo arquivo) também aparece na próxima busca ou análise.</li>
+    <li><b>Termo apagado em outra máquina:</b> uma única janela pergunta <span class="ui">Apagar</span> ou <span class="ui">Manter local</span>. O que você mantém fica só neste computador.</li>
+  </ul>
+  <h3><span>Novo baseline</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>O administrador publica um DadosBUDA novo: o corte avança e a nuvem descarta o que o arquivo novo já traz. A publicação é recusada se o arquivo perderia alguma alteração da nuvem.</li>
+    <li>Na abertura, o app oferece o DadosBUDA novo. Instale-o: quem fica no arquivo antigo deixa de receber o que entrou no novo baseline.</li>
+    <li>Os termos que você manteve localmente ficam fora do arquivo e sobrevivem à troca.</li>
+    <li><b>Remoção de parte do glossário:</b> o administrador pode retirar uma parte (um dicionário inteiro, por exemplo) de todas as máquinas. O app aplica a remoção sozinho e avisa uma vez.</li>
+  </ul>
+</section>
+
+<section id="caderno">
+  <h2><span><span class="num">11</span>Caderno de Tradução</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><span class="ui">▲ Caderno de Tradução</span> (embaixo) abre e fecha a gaveta, que fica sempre abaixo dos cartões.</li>
+    <li><b>Cartões do caderno:</b> criados por <span class="ui">Enviar ao caderno</span> — termo, tradução escolhida, contexto, gramática e morfologia. Arraste para reordenar ou digite a posição; <span class="ui">Limpar Cartões</span> esvazia.</li>
+    <li><b>Notas:</b> editor com as mesmas funções do principal (páginas, formatação, desfazer).</li>
+    <li><b>Cadernos:</b> clique no título para renomear; abra outros cadernos. O caderno se salva sozinho.</li>
+    <li><b>Conv. ▾:</b> converte <code>.docx</code> em caderno — um ou vários arquivos, ou converter e abrir.</li>
+  </ul>
+</section>
+
+<section id="ortografia">
+  <h2><span><span class="num">12</span>Ortografia e correção automática</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>Palavra sublinhada → botão direito → Ortografia:</b> sugestões, <span class="ui">Aceitar esta grafia</span>, <span class="ui">Preferir sempre</span>, <span class="ui">Reverter</span>.</li>
+    <li><b>Digitar a correção…:</b> você escreve a forma certa; ela passa a ser aplicada sozinha, em qualquer idioma.</li>
+    <li><b>Opções</b> (no mesmo menu): <span class="ui">Corrigir erros automaticamente</span>, <span class="ui">Corrigir erros de digitação pelo dicionário</span>, <span class="ui">Corrigir diacríticos automaticamente</span> (restaura os diacríticos do sânscrito ao terminar a palavra).</li>
+    <li><b>Itálico de termos estrangeiros:</b> automático em termos transliterados. <span class="ui">Ignorar itálico</span> o desliga para aquele termo, como num nome próprio.</li>
+    <li>Uma palavra válida nunca é trocada, e entre grafias ambíguas o app não escolhe sozinho: mostra as opções.</li>
+  </ul>
+</section>
+
+<section id="ia">
+  <h2><span><span class="num">13</span>IA</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <p>Menu <span class="ui">IA ▼</span>, com <span class="ui">Habilitar recursos de IA</span> ligado:</p>
+  <dl>
+    <dt>Modelos e contas</dt>
+    <dd><span class="ui">Escolher modelos…</span> (empresa, modelo, saldo e uso) e <span class="ui">Adicionar empresa…</span> (sua chave de API: Claude, OpenAI, DeepSeek…).</dd>
+    <dt>Perguntar à IA…</dt>
+    <dd>Pergunta livre sobre tibetano ou budismo.</dd>
+    <dt>Traduzir seleção</dt>
+    <dd>Com a IA escolhida, com o NLLB (offline, local) ou com a <a href="#dharmamitra">Dharmamitra</a> (online, modelo especializado).</dd>
+    <dt>Analisar</dt>
+    <dd><span class="ui">Análise gramatical…</span> e <span class="ui">Onde aparece — corpus Dharmamitra…</span> (gratuito, sem chave; ver <a href="#dharmamitra">Dharmamitra</a>).</dd>
+    <dt>Histórico de conversas…</dt>
+    <dd>Retoma conversas anteriores, organizadas por termo.</dd>
+    <dt>Opções de IA</dt>
+    <dd><span class="ui">Morfologia por IA nos termos</span>; <span class="ui">Dharmamitra: citações estruturadas (v2)</span>.</dd>
+  </dl>
+  <p class="note">A IA recebe os cartões que você está vendo, e o glossário serve de referência. Quando você corrige um termo, a sua correção prevalece.</p>
+</section>
+
+<section id="conversa">
+  <h2><span><span class="num">14</span>Conversa com a IA</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>Enviar:</b> <kbd>Enter</kbd> ou <kbd>Ctrl+Enter</kbd>, conforme a dica abaixo da caixa — clique nela para trocar. <kbd>Esc</kbd> interrompe a resposta e mantém o que já chegou.</li>
+    <li><b>Modos:</b> assistente, pesquisa (web, com fontes), tradutor, referências.</li>
+    <li><b>Raciocínio:</b> o que o modelo pensou aparece à parte e não entra na resposta.</li>
+    <li><b>Exportar:</b> copiar formatado (para colar no Word) ou salvar em <code>.md</code>, <code>.html</code> ou <code>.pdf</code>.</li>
+  </ul>
+  <h3><span>Comandos</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Comando</th><th>Faz</th></tr></thead>
+    <tbody>
+      <tr><td><code>/modo</code> assistente | web | tradutor | referencias</td><td>O que as próximas mensagens pedem</td></tr>
+      <tr><td><code>/traduzir</code> [texto]</td><td>Traduzir (com texto: só esta mensagem)</td></tr>
+      <tr><td><code>/pesquisa</code> [texto]</td><td>Pesquisar na web e citar as fontes</td></tr>
+      <tr><td><code>/citar</code> [estilo] [obras]</td><td>Lista de referências</td></tr>
+      <tr><td><code>/estilo</code> abnt | apa | mla | chicago | harvard | vancouver | ieee</td><td>Estilo das referências</td></tr>
+      <tr><td><code>/assistente</code> [texto]</td><td>Voltar ao modo assistente</td></tr>
+      <tr><td><code>/modelo</code> [filtro]</td><td>Trocar empresa e modelo; a conversa continua</td></tr>
+      <tr><td><code>/raciocinio</code> [nível]</td><td>Nível de raciocínio, quando o modelo tem</td></tr>
+      <tr><td><code>/opcoes</code></td><td>Todas as opções deste modelo</td></tr>
+      <tr><td><code>/padrao</code> · <code>/resetar</code></td><td>Usar esta escolha como padrão do app · voltar às opções do modelo</td></tr>
+      <tr><td><code>/parar</code> · <code>/limpar</code> · <code>/exportar</code></td><td>Interromper · apagar a conversa · copiar ou salvar</td></tr>
+      <tr><td><code>/ajuda</code></td><td>Listar os comandos</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="dharmamitra">
+  <h2><span><span class="num">15</span>Dharmamitra</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <p class="muted">Serviço público e gratuito do projeto Dharmamitra, sem chave. Limite de cerca de 10 pedidos por minuto, repartido pelo app inteiro.</p>
+  <h3><span>Traduzir</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li><span class="ui">IA ▼ ▸ Traduzir seleção ▸ Dharmamitra (online)…</span>: modelo especializado para tibetano, sânscrito (IAST ou devanágari), páli e chinês. Textos longos chegam em partes.</li>
+    <li>Com <span class="ui">Paralelos canônicos</span>, a tradução traz pares do corpus da Dharmamitra.</li>
+  </ul>
+  <h3><span>Na conversa</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>Escolha a Dharmamitra em <span class="ui">Modelos e contas</span> (ou <code>/modelo</code>).</li>
+    <li><b>Função:</b> <span class="ui">Automática</span> (tradução quando a mensagem traz tibetano, sânscrito, páli ou chinês; senão, o assistente), <span class="ui">Tradução especializada</span> (com o seu dicionário e paralelos do corpus), <span class="ui">Assistente</span>, <span class="ui">Pesquisa com citações</span> (no corpus, com links; mais lenta).</li>
+    <li><b>Outras opções:</b> Modelo Mitra (Pro, Base), Codificação da entrada (Unicode, Wylie, devanágari, IAST, Harvard-Kyoto), Paralelos canônicos.</li>
+    <li>Um pedido como "traduza grande compaixão para o sânscrito" traduz texto em qualquer língua para a língua pedida (sânscrito, devanágari, tibetano, chinês…).</li>
+    <li>O serviço aceita pouco texto por vez: recebe só as trocas mais recentes da conversa.</li>
+  </ul>
+  <h3><span>Corpus (banco de dados)</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li><span class="ui">IA ▼ ▸ Analisar ▸ Onde aparece — corpus Dharmamitra…</span> abre a janela de busca no corpus: digite um termo ou uma passagem e veja as passagens atestadas, com a frase completa.</li>
+    <li>O mesmo corpus fornece os paralelos canônicos das traduções e o contexto da Tradução especializada.</li>
+  </ul>
+  <h3><span>Nos cartões</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>Morfologia por IA, em sânscrito e em palavras em inglês ou português — ver <a href="#morfologia">Morfologia</a>.</li>
+    <li><span class="ui">Dharmamitra: citações estruturadas (v2)</span>: as citações chegam como dados (obra e trecho), não como texto solto.</li>
+  </ul>
+</section>
+
+<section id="ocr">
+  <h2><span><span class="num">16</span>OCR e captura de texto</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><b>OCR</b> (<kbd>F9</kbd>): <span class="ui">Captura de Tela</span> ou <span class="ui">Carregar Imagem…</span>.</li>
+    <li><b>Motores:</b> Tibetano (Namsel), Sânscrito IAST, Sânscrito Devanágari, Chinês horizontal e vertical, Américas (Tesseract), Multilíngua (experimental).</li>
+    <li><b>Local / Remoto:</b> a chave ao lado do botão escolhe onde o OCR roda.</li>
+    <li><b>Captura F10:</b> ligada no menu do OCR. Selecione texto em qualquer programa e tecle <kbd>F10</kbd> para inseri-lo no editor.</li>
+  </ul>
+</section>
+
+<section id="audio">
+  <h2><span><span class="num">17</span>Áudio e legendas ao vivo</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <p class="muted">Requer o pacote <b>Áudio</b> do SegBUDA.</p>
+  <h3><span>Carregar áudio</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>Transcreve tibetano de um arquivo e traduz com a IA ou com o NLLB offline.</li>
+    <li>Opções: <span class="ui">[mm:ss]</span> (marcas de tempo, ou parágrafo corrido) e <span class="ui">Só transcrição</span>.</li>
+    <li><span class="ui">Refinar</span> retraduz todas as linhas usando a transcrição completa como contexto.</li>
+    <li><span class="ui">Inserir Tibetano / Tradução / Ambos</span> leva o resultado ao editor.</li>
+  </ul>
+  <h3><span>Ao Vivo (Mic / Sistema)</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>Legendas do microfone ou do áudio do sistema (YouTube, Zoom).</li>
+    <li>Tradução: Groq (rápido), DeepSeek (preciso) ou NLLB offline.</li>
+    <li><b>Contexto do evento</b> (local, palestrante, evento): fixa a grafia dos nomes próprios.</li>
+  </ul>
+</section>
+
+<section id="escolhas">
+  <h2><span><span class="num">18</span>Registro de escolhas</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li><span class="ui">Tradução ▸ Manter escolhas localmente</span>: grava no seu computador o cartão escolhido e as correções que você aceita, recusa ou desfaz, para medir e melhorar a ordem dos cartões. Nada é enviado. Vem desligado.</li>
+    <li><span class="ui">Tradução ▸ Sinalizar traduções rejeitadas</span>: marca o cartão com <span class="ui">⚠ Tradução rejeitada</span> quando a tradução está numa lista curada; o motivo aparece na dica.</li>
+  </ul>
+</section>
+
+<section id="atualizacoes">
+  <h2><span><span class="num">19</span>Atualizações</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <ul>
+    <li>Ao abrir, o app procura uma versão nova. A janela <span class="ui">Atualização Disponível</span> mostra as notas e oferece <span class="ui">Baixar e Instalar</span>, <span class="ui">Pular Atualização</span>, as notas completas e o <span class="ui">Manual do Usuário</span> — esta página.</li>
+    <li>Os pacotes de modelos e os dados do glossário (DadosBUDA — ver <a href="#sincronizacao">baseline</a>) também são oferecidos pelo app quando há versão nova.</li>
+  </ul>
+</section>
+
+<section id="atalhos">
+  <h2><span><span class="num">20</span>Atalhos de teclado</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Tecla</th><th>Ação</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Ctrl+Shift+E</kbd></td><td>Analisar seleção</td></tr>
+      <tr><td><kbd>Ctrl+Shift+N</kbd></td><td>Adicionar termo ao dicionário</td></tr>
+      <tr><td><kbd>Ctrl+Shift+R</kbd></td><td>Editar termo no dicionário</td></tr>
+      <tr><td><kbd>Ctrl+Shift+D</kbd></td><td>Consultar termos no dicionário</td></tr>
+      <tr><td><kbd>Ctrl+Shift+L</kbd></td><td>Adicionar tradução multilíngue</td></tr>
+      <tr><td><kbd>Ctrl+Shift+M</kbd></td><td>Renderizar / converter Markdown</td></tr>
+      <tr><td><kbd>Ctrl+Shift+A</kbd></td><td>Juntar as páginas e selecionar o documento</td></tr>
+      <tr><td><kbd>Ctrl+B</kbd> · <kbd>Ctrl+I</kbd> · <kbd>Ctrl+U</kbd></td><td>Negrito · itálico · sublinhado</td></tr>
+      <tr><td><kbd>Ctrl+M</kbd></td><td>Aumentar recuo</td></tr>
+      <tr><td><kbd>Ctrl+Z</kbd> · <kbd>Ctrl+Y</kbd></td><td>Desfazer · refazer</td></tr>
+      <tr><td><kbd>F9</kbd></td><td>OCR</td></tr>
+      <tr><td><kbd>F10</kbd></td><td>Inserir o texto selecionado em outro programa (Captura F10 ligada)</td></tr>
+      <tr><td><kbd>Enter</kbd> ou <kbd>Ctrl+Enter</kbd> · <kbd>Esc</kbd></td><td>Enviar mensagem à IA (conforme a dica) · interromper a resposta</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  TradutorBUDA · <a href="/">site de download</a> · manual atualizado em outubro de 2026
+</footer>
+
+</body>
+</html>

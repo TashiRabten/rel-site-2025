@@ -39,7 +39,7 @@ const BUNDLES = [
         badge: { cls: 'add', text: 'Complemento' },
         available: true,
         requires: 'Essencial',
-        sizeMb: 235,
+        sizeMb: 1500,
         summary: 'Transcrição de fala tibetana, tradução offline (NLLB, tibetano → inglês) e captura de áudio do sistema (Windows + macOS).',
         models: ['Reconhecimento de fala tibetana (wav2vec2 CTC, INT8)', 'Tradução offline tibetano → inglês (NLLB)', 'Captura de áudio do sistema'],
     },
