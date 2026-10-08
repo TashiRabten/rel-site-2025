@@ -204,7 +204,7 @@
     <li><a href="#conversa">Conversa com a IA</a></li>
     <li><a href="#dharmamitra">Dharmamitra</a></li>
     <li><a href="#ocr">OCR e captura de texto</a></li>
-    <li><a href="#audio">Áudio e legendas ao vivo</a></li>
+    <li><a href="#audio">Áudio, legendas ao vivo e pronúncia</a></li>
     <li><a href="#escolhas">Registro de escolhas</a></li>
     <li><a href="#atualizacoes">Atualizações</a></li>
     <li><a href="#atalhos">Atalhos de teclado</a></li>
@@ -262,15 +262,15 @@
     <dt>Ações rápidas</dt>
     <dd>Desfazer, Refazer, Recortar, Copiar, Colar, Excluir.</dd>
     <dt>Dicionário</dt>
-    <dd>Adicionar, editar e consultar termos; termos similares. Ver <a href="#glossario">Glossário</a>.</dd>
+    <dd>Adicionar, editar e consultar termos; termos similares; <span class="ui">Ouvir pronúncia</span> do tibetano selecionado (ver <a href="#pronuncia">Ouvir pronúncia</a>). Ver <a href="#glossario">Glossário</a>.</dd>
     <dt>Tradução</dt>
-    <dd>Multilíngue, Sinônimos, Analisar seleção, Enviar ao caderno, Converter escrita (<span class="ui">Tibetano → Wylie</span>, <span class="ui">IAST → Devanágari</span>, <span class="ui">Devanágari → IAST</span>) e as opções do <a href="#escolhas">registro de escolhas</a>.</dd>
+    <dd>Multilíngue, Sinônimos, <span class="ui">Traduzir com IA</span> (ver <a href="#ia">IA</a>), Analisar seleção, Enviar ao caderno, Converter escrita (<span class="ui">Tibetano → Wylie</span>, <span class="ui">IAST → Devanágari</span>, <span class="ui">Devanágari → IAST</span>) e as opções do <a href="#escolhas">registro de escolhas</a>.</dd>
     <dt>Formatação · Caso</dt>
     <dd>Negrito, itálico, sublinhado; <span class="ui">Caso</span> troca maiúsculas e minúsculas da seleção ou da palavra do cursor; Renderizar Markdown.</dd>
     <dt>Tabela</dt>
     <dd>Adicionar ou remover linhas e colunas.</dd>
     <dt>Ortografia</dt>
-    <dd>Aparece numa palavra marcada. Ver <a href="#ortografia">Ortografia</a>.</dd>
+    <dd>Aparece numa palavra marcada: no topo, em <b>vinho</b>, as funções de correção automática; abaixo, em azul, as correções. Ver <a href="#ortografia">Ortografia</a>.</dd>
     <dt>Rodapé</dt>
     <dd>Selecionar página, Selecionar tudo, Consultar diacrítico, e a contagem de palavras.</dd>
   </dl>
@@ -342,7 +342,7 @@
     <dt>Termos similares</dt>
     <dd>Entradas próximas do termo selecionado.</dd>
     <dt>Tradução multilíngue — <kbd>Ctrl+Shift+L</kbd> · Sinônimos</dt>
-    <dd>Inserem no texto, entre parênteses, as traduções do termo nos idiomas escolhidos, ou os seus sinônimos. Com <span class="ui">Escolher entre opções</span>, abre um menu em cada idioma que tem mais de uma tradução.</dd>
+    <dd>Inserem no texto, entre parênteses, as traduções do termo nos idiomas escolhidos, ou os seus sinônimos. Com <span class="ui">Escolher entre opções</span>, abre um menu em cada idioma que tem mais de uma tradução. Cada menu pede uma resposta: <kbd>Enter</kbd> ou clique escolhe, <kbd>Esc</kbd> ou <span class="ui">Manter</span> mantém o que foi escrito; um clique fora traz o menu de volta. Funciona também quando o texto inserido passa para a página seguinte.</dd>
     <dt>Consultar diacrítico</dt>
     <dd>As grafias da palavra no glossário e o que distingue cada uma (ex.: <i>śīla, sīla, śilā</i>).</dd>
     <dt>Sincronização</dt>
@@ -389,10 +389,11 @@
 <section id="ortografia">
   <h2><span><span class="num">12</span>Ortografia e correção automática</span><a class="voltar" href="#indice">↑ Índice</a></h2>
   <ul>
-    <li><b>Palavra sublinhada → botão direito → Ortografia:</b> sugestões, <span class="ui">Aceitar esta grafia</span>, <span class="ui">Preferir sempre</span>, <span class="ui">Reverter</span>.</li>
+    <li><b>Palavra sublinhada → botão direito:</b> no topo, em <b>vinho</b>, as funções de correção automática — <span class="ui">Aceitar português</span>, <span class="ui">Aceitar inglês</span>, <span class="ui">Reverter</span>, <span class="ui">Usar … como correção automática</span>, <span class="ui">Parar de corrigir</span>, <span class="ui">Corrigir automaticamente para ›</span>, <span class="ui">Sempre corrigir para ›</span>, <span class="ui">Digitar a correção…</span>. Abaixo, em azul, as correções desta palavra.</li>
+    <li><b>Aceitar português · Aceitar inglês:</b> desfaz a correção automática, põe a grafia na lista de aceitas e não a corrige mais. O itálico segue o idioma do parágrafo: uma palavra inglesa num parágrafo em português (ou portuguesa num parágrafo em inglês) sai em itálico, como estrangeirismo; no mesmo idioma, ou quando o idioma do parágrafo não é claro, sai reta. Vale também quando você a digita de novo.</li>
     <li><b>Digitar a correção…:</b> você escreve a forma certa; ela passa a ser aplicada sozinha, em qualquer idioma.</li>
-    <li><b>Opções</b> (no mesmo menu): <span class="ui">Corrigir erros automaticamente</span>, <span class="ui">Corrigir erros de digitação pelo dicionário</span>, <span class="ui">Corrigir diacríticos automaticamente</span> (restaura os diacríticos do sânscrito ao terminar a palavra).</li>
-    <li><b>Itálico de termos estrangeiros:</b> automático em termos transliterados. <span class="ui">Ignorar itálico</span> o desliga para aquele termo, como num nome próprio.</li>
+    <li><b>Submenu Ortografia:</b> <span class="ui">Aceitar esta grafia</span> (sem idioma; também para o tibetano), <span class="ui">Não aceitar mais esta grafia</span> e as opções <span class="ui">Corrigir erros automaticamente</span>, <span class="ui">Corrigir erros de digitação pelo dicionário</span>, <span class="ui">Corrigir diacríticos automaticamente</span> (restaura os diacríticos do sânscrito ao terminar a palavra).</li>
+    <li><b>Itálico de termos estrangeiros:</b> automático em termos transliterados. Uma correção escolhida na lista segue a mesma regra — termo páli ou sânscrito em itálico, palavra portuguesa ou inglesa reta —, e o itálico que você mesmo aplicou (numa citação, por exemplo) é mantido. <span class="ui">Ignorar itálico</span> o desliga para aquele termo, como num nome próprio.</li>
     <li>Uma palavra válida nunca é trocada, e entre grafias ambíguas o app não escolhe sozinho: mostra as opções.</li>
   </ul>
 </section>
@@ -407,6 +408,8 @@
     <dd>Pergunta livre sobre tibetano ou budismo.</dd>
     <dt>Traduzir seleção</dt>
     <dd>Com a IA escolhida, com o NLLB (offline, local) ou com a <a href="#dharmamitra">Dharmamitra</a> (online, modelo especializado).</dd>
+    <dt>Traduzir com IA — <kbd>Ctrl+Shift+I</kbd></dt>
+    <dd>No menu de contexto (<span class="ui">Tradução</span>): traduz a seleção com a IA escolhida e insere a tradução entre parênteses logo depois dela. A <span class="ui">›</span> escolhe o idioma (português por padrão; inglês, espanhol, francês, alemão, sânscrito, chinês, tibetano) e liga <span class="ui">Linha a linha (Dharmamitra)</span>: cada linha recebe a sua tradução. Um <kbd>Ctrl+Z</kbd> desfaz.</dd>
     <dt>Analisar</dt>
     <dd><span class="ui">Análise gramatical…</span> e <span class="ui">Onde aparece — corpus Dharmamitra…</span> (gratuito, sem chave; ver <a href="#dharmamitra">Dharmamitra</a>).</dd>
     <dt>Histórico de conversas…</dt>
@@ -486,7 +489,7 @@
 </section>
 
 <section id="audio">
-  <h2><span><span class="num">17</span>Áudio e legendas ao vivo</span><a class="voltar" href="#indice">↑ Índice</a></h2>
+  <h2><span><span class="num">17</span>Áudio, legendas ao vivo e pronúncia</span><a class="voltar" href="#indice">↑ Índice</a></h2>
   <p class="muted">Requer o pacote <b>Áudio</b> do SegBUDA.</p>
   <h3><span>Carregar áudio</span><a class="voltar" href="#indice">↑ Índice</a></h3>
   <ul>
@@ -500,6 +503,12 @@
     <li>Legendas do microfone ou do áudio do sistema (YouTube, Zoom).</li>
     <li>Tradução: Groq (rápido), DeepSeek (preciso) ou NLLB offline.</li>
     <li><b>Contexto do evento</b> (local, palestrante, evento): fixa a grafia dos nomes próprios.</li>
+  </ul>
+  <h3 id="pronuncia"><span>Ouvir pronúncia</span><a class="voltar" href="#indice">↑ Índice</a></h3>
+  <ul>
+    <li>Selecione um texto em tibetano → botão direito → <span class="ui">Dicionário ▸ Ouvir pronúncia</span> (<kbd>Ctrl+Shift+P</kbd>; a <span class="ui">›</span> oferece <span class="ui">Devagar</span>).</li>
+    <li>Abre uma janela com o tibetano em letra grande, lido por uma voz tibetana: <span class="ui">Ouvir de novo</span>, <span class="ui">Devagar</span>, <span class="ui">Parar</span>. Trechos longos são lidos frase a frase.</li>
+    <li>Ao lado, a tradução no idioma escolhido (inglês por padrão; português, espanhol, francês, alemão, sânscrito, chinês), pelo <span class="ui">Modelo do app</span> ou pelo <span class="ui">NLLB offline</span> (só inglês). <span class="ui">Copiar tradução</span> leva o texto.</li>
   </ul>
 </section>
 
@@ -530,6 +539,8 @@
       <tr><td><kbd>Ctrl+Shift+R</kbd></td><td>Editar termo no dicionário</td></tr>
       <tr><td><kbd>Ctrl+Shift+D</kbd></td><td>Consultar termos no dicionário</td></tr>
       <tr><td><kbd>Ctrl+Shift+L</kbd></td><td>Adicionar tradução multilíngue</td></tr>
+      <tr><td><kbd>Ctrl+Shift+I</kbd></td><td>Traduzir com IA (a tradução entre parênteses, depois da seleção)</td></tr>
+      <tr><td><kbd>Ctrl+Shift+P</kbd></td><td>Ouvir pronúncia do tibetano selecionado</td></tr>
       <tr><td><kbd>Ctrl+Shift+M</kbd></td><td>Renderizar / converter Markdown</td></tr>
       <tr><td><kbd>Ctrl+Shift+A</kbd></td><td>Juntar as páginas e selecionar o documento</td></tr>
       <tr><td><kbd>Ctrl+B</kbd> · <kbd>Ctrl+I</kbd> · <kbd>Ctrl+U</kbd></td><td>Negrito · itálico · sublinhado</td></tr>
