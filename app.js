@@ -15,31 +15,31 @@ const API = '/.netlify/functions/get-releases';
 const BUNDLES = [
     {
         id: 'essential',
-        name: 'Essencial',
+        name: 'Essenciais',
+        assets: { windows: 'SegBUDA-Essenciais-Setup-essential.exe', mac: 'SegBUDA-Essenciais-essential.pkg' },
         badge: { cls: 'req', text: 'Necessário' },
         available: true,
         requires: null,
-        sizeMb: 400,
-        summary: 'O mínimo para traduzir: ranqueamento de traduções e segmentação de palavras tibetanas.',
-        models: ['Ranqueamento de traduções (NLLB)', 'Segmentação de palavras tibetanas'],
+        summary: 'Tradução e OCR de várias escritas: tibetano, devanágari, latino e chinês.',
+        models: ['Ranqueamento de traduções (NLLB)', 'Detecção de linhas para OCR', 'OCR multilíngue', 'Dicionários ortográficos'],
     },
     {
         id: 'segmentation',
-        name: 'Segmentação',
+        name: 'Intermediário',
+        assets: { windows: 'SegBUDA-Intermediario-Setup-segmentation.exe', mac: 'SegBUDA-Intermediario-segmentation.pkg' },
         badge: { cls: 'add', text: 'Complemento' },
         available: true,
-        requires: 'Essencial',
-        sizeMb: 580,
-        summary: 'Análise avançada: segmentação de sânscrito e morfologia tibetana (caso / partículas).',
-        models: ['Segmentador de sânscrito (sandhi)', 'Morfologia tibetana (UPOS / caso)'],
+        requires: 'Essenciais',
+        summary: 'Recursos adicionais de segmentação de sânscrito, morfologia tibetana e OCR tibetano.',
+        models: ['Segmentador de sânscrito (sandhi)', 'Morfologia tibetana (UPOS / caso)', 'Leitor OCR tibetano PechaBridge'],
     },
     {
         id: 'audio',
         name: 'Áudio',
+        assets: { windows: 'SegBUDA-Audio-Setup.exe', mac: 'SegBUDA-Audio.pkg' },
         badge: { cls: 'add', text: 'Complemento' },
         available: true,
-        requires: 'Essencial',
-        sizeMb: 1500,
+        requires: 'Essenciais',
         summary: 'Transcrição de fala tibetana, tradução offline (NLLB, tibetano → inglês) e captura de áudio do sistema (Windows + macOS).',
         models: ['Reconhecimento de fala tibetana (wav2vec2 CTC, INT8)', 'Tradução offline tibetano → inglês (NLLB)', 'Captura de áudio do sistema'],
     },
@@ -66,7 +66,6 @@ const APPS = [
 const DATA = {
     name: 'DadosBUDA',
     match: 'dadosbuda',
-    sizeMb: 2400,
     summary: 'Banco de dados do glossário budista. Instala e substitui o glossario_terms.db na pasta glossariobuda — usado pelo TradutorBUDA e pelo GlossárioBUDA.',
 };
 
@@ -80,8 +79,25 @@ function detectOS() {
     return 'unknown';
 }
 
-function fmtSize(mb) {
-    return mb >= 1024 ? (mb / 1024).toFixed(mb >= 10240 ? 0 : 1) + ' GB' : Math.round(mb) + ' MB';
+function fmtBytes(bytes) {
+    if (bytes === null || bytes === undefined || bytes === '') return '';
+    const value = Number(bytes);
+    if (!Number.isFinite(value) || value < 0) return '';
+    if (value < 1000) return `${Math.round(value)} B`;
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let size = value;
+    let unitIndex = 0;
+    while (size >= 1000 && unitIndex < units.length - 1) {
+        size /= 1000;
+        unitIndex++;
+    }
+    let precision = unitIndex === 0 || size >= 100 ? 0 : 1;
+    if (Number(size.toFixed(precision)) >= 1000 && unitIndex < units.length - 1) {
+        size /= 1000;
+        unitIndex++;
+        precision = size >= 100 ? 0 : 1;
+    }
+    return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: precision }).format(size)} ${units[unitIndex]}`;
 }
 
 /** Fetch every release asset, newest-first, each tagged with its release name. */
@@ -139,15 +155,20 @@ function macInstallers(assets, app) {
 }
 
 /** Newest installer asset for a given bundle + platform. */
-function findBundle(assets, bundleId, os) {
-    const ext = EXT[os];
-    return assets.find(a => a.lower.endsWith(ext) && a.lower.includes('segbuda') && a.lower.includes(bundleId));
+function findBundle(assets, bundle, os) {
+    const expected = bundle.assets?.[os];
+    if (!expected) return null;
+    return assets.find(a => a.lower === expected.toLowerCase());
 }
 
 function osLabel(os) { return os === 'windows' ? 'Windows' : 'Mac'; }
-// Portable emoji — the Apple brand glyph renders only on Apple devices and shows
-// as tofu (square) on Windows/Linux. 🪟 / 🍎 render everywhere.
-function osIcon(os) { return os === 'windows' ? '🪟' : '🍎'; }
+// Neutral computer glyphs identify installer types without using brand artwork.
+function osIcon(os) {
+    if (os === 'windows') {
+        return '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 21h8M12 16v5"/></svg>';
+    }
+    return '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="14" rx="2"/><path d="M4 21h16l-1.5-4h-13L4 21z"/></svg>';
+}
 
 /** A download button (or a disabled placeholder when the asset is missing). */
 function button(asset, os, { secondary = false, recommended = false, archLabel = null } = {}) {
@@ -157,10 +178,11 @@ function button(asset, os, { secondary = false, recommended = false, archLabel =
     const label = archLabel ? `${osLabel(os)} · ${archLabel}` : `${osLabel(os)}`;
     if (!asset) {
         return `<a class="${cls.join(' ')}" aria-disabled="true" title="Ainda não publicado">
-                  <span class="os">${osIcon(os)}</span> ${label} · indisponível</a>`;
+                  <span class="os">${osIcon(os)}</span>${label} · indisponível</a>`;
     }
+    const size = fmtBytes(asset.size);
     return `<a class="${cls.join(' ')}" href="${asset.url}">
-              <span class="os">${osIcon(os)}</span> ${label}</a>`;
+              <span class="os">${osIcon(os)}</span>${label}${size ? ` · ${size}` : ''}</a>`;
 }
 
 function renderApps(assets) {
@@ -203,8 +225,8 @@ function renderApps(assets) {
 function renderBundles(assets) {
     const el = document.getElementById('bundles');
     el.innerHTML = BUNDLES.map(b => {
-        const win = b.available ? findBundle(assets, b.id, 'windows') : null;
-        const mac = b.available ? findBundle(assets, b.id, 'mac') : null;
+        const win = b.available ? findBundle(assets, b, 'windows') : null;
+        const mac = b.available ? findBundle(assets, b, 'mac') : null;
         const models = b.models.map(m => `<li>${m}</li>`).join('');
         const requires = b.requires
             ? `<div class="meta">Requer: <b>${b.requires}</b></div>` : '';
@@ -224,7 +246,6 @@ function renderBundles(assets) {
                     <span class="badge ${b.badge.cls}">${b.badge.text}</span>
                 </div>
                 <div class="summary">${b.summary}</div>
-                <div class="meta"><b>~${fmtSize(b.sizeMb)}</b> para baixar</div>
                 ${requires}
                 <ul class="models">${models}</ul>
                 <div class="actions">${actions}</div>
@@ -255,7 +276,6 @@ function renderData(assets) {
                 <span class="badge req">Necessário</span>
             </div>
             <div class="summary">${DATA.summary}</div>
-            <div class="meta"><b>~${fmtSize(DATA.sizeMb)}</b> para baixar</div>
             <div class="meta">Substitui o banco em <b>Documentos/glossariobuda</b></div>
             ${ver}
             <div class="actions">${winFirst ? w + m : m + w}</div>

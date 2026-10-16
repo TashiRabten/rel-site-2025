@@ -185,6 +185,19 @@
 
 <main class="wrap">
 
+<section id="macos-bloqueio">
+  <h2>macOS: permitir a abertura do app</h2>
+  <p>Na primeira abertura, o macOS pode bloquear o TradutorBUDA e mostrar um aviso de segurança. Para autorizá-lo:</p>
+  <ol>
+    <li>No aviso de bloqueio, clique em <span class="ui">OK</span> para fechá-lo.</li>
+    <li>Abra <span class="ui">Ajustes do Sistema → Privacidade e Segurança</span>.</li>
+    <li>Role a página para baixo até a seção <span class="ui">Segurança</span>. A opção fica mais abaixo e é fácil passar por ela.</li>
+    <li>Na mensagem de que o TradutorBUDA foi bloqueado, clique em <span class="ui">Abrir Mesmo Assim</span>.</li>
+    <li>Confirme a autorização com sua senha ou Touch ID, se solicitado, e clique em <span class="ui">Abrir</span>.</li>
+  </ol>
+  <p class="note">O botão <span class="ui">Abrir Mesmo Assim</span> só aparece depois da primeira tentativa bloqueada. Se não aparecer, tente abrir o app, feche o aviso com <span class="ui">OK</span> e volte a <span class="ui">Privacidade e Segurança</span>.</p>
+</section>
+
 <nav id="indice" aria-label="Índice">
   <h2>Índice</h2>
   <ol>
@@ -215,7 +228,7 @@
   <h2><span><span class="num">1</span>Primeiros passos</span><a class="voltar" href="#indice">↑ Índice</a></h2>
   <ul>
     <li><b>Instalação:</b> baixe o instalador (Windows <code>.exe</code> ou macOS <code>.pkg</code>) no <a href="/">site de download</a>.</li>
-    <li><b>Pacotes de modelos (SegBUDA):</b> instalados à parte, sem reinstalar o app — <b>Essencial</b> (ranqueamento das traduções), <b>Segmentação</b> e <b>Áudio</b> (transcrição). O app avisa na abertura quando o Essencial falta.</li>
+    <li><b>Pacotes de modelos (SegBUDA):</b> instalados à parte, sem reinstalar o app — <b>Essenciais</b> (ranqueamento, detecção de linhas e OCR de várias escritas), <b>Intermediário</b> (segmentação de sânscrito, morfologia tibetana e leitor PechaBridge) e <b>Áudio</b> (transcrição e voz). O app avisa na abertura quando Essenciais falta.</li>
     <li><b>Modo Tradutor e Modo Editor:</b> o Tradutor carrega modelos e índices para a análise completa; o Editor é leve, só edição e glossário. Troca pelo <a href="#modelo">botão do modelo</a>.</li>
     <li><b>Várias janelas:</b> abrir o app de novo oferece uma nova janela no mesmo processo. As janelas compartilham glossário e modelos.</li>
   </ul>
