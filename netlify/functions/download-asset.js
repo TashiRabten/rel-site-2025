@@ -4,126 +4,96 @@
  */
 
 const fetch = require('node-fetch');
+const RELEASE_OWNER = 'TashiRabten';
+const RELEASE_REPOSITORY = 'GlossarioBUDA';
+const CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS'
+};
+
+function jsonResponse(statusCode, value) {
+    return {
+        statusCode,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify(value)
+    };
+}
+
+function isAllowedAsset(owner, repo, assetId) {
+    return owner === RELEASE_OWNER
+        && repo === RELEASE_REPOSITORY
+        && /^[0-9]+$/.test(assetId || '');
+}
+
+async function fetchAsset(assetId, token) {
+    // The host/repository are constants and assetId is decimal-validated before this call.
+    // nosemgrep: Semgrep_rules_lgpl_javascript_ssrf_rule-node-ssrf
+    return fetch(`https://api.github.com/repos/${RELEASE_OWNER}/${RELEASE_REPOSITORY}/releases/assets/${assetId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/octet-stream',
+            'User-Agent': 'Private-Releases-Site'
+        },
+        redirect: 'manual'
+    });
+}
+
+function formatAssetResponse(response, filename, wantsJson) {
+    if (response.status === 302 || response.status === 301) {
+        const downloadUrl = response.headers.get('location');
+        if (downloadUrl) {
+            if (wantsJson) {
+                return jsonResponse(200, { url: downloadUrl, filename });
+            }
+            return {
+                statusCode: response.status,
+                headers: { Location: downloadUrl, 'Cache-Control': 'no-cache' },
+                body: ''
+            };
+        }
+    }
+    if (!response.ok) {
+        console.error(`Failed to get asset download URL: ${response.status}`);
+        return jsonResponse(response.status, {
+            error: `Failed to get download URL: ${response.status} ${response.statusText}`
+        });
+    }
+    return jsonResponse(500, { error: 'Unable to get download URL from GitHub' });
+}
 
 exports.handler = async (event, context) => {
-    // Enable CORS
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS'
-    };
-
-    // Handle preflight request
     if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: ''
-        };
+        return { statusCode: 200, headers: CORS_HEADERS, body: '' };
     }
-
-    // Only allow GET requests
     if (event.httpMethod !== 'GET') {
-        return {
-            statusCode: 405,
-            headers,
-            body: JSON.stringify({ error: 'Method not allowed' })
-        };
+        return jsonResponse(405, { error: 'Method not allowed' });
     }
 
     try {
-        // Get parameters from query string
         const params = event.queryStringParameters || {};
         const { owner, repo, assetId, filename } = params;
-
         if (!owner || !repo || !assetId) {
-            return {
-                statusCode: 400,
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ error: 'Missing required parameters: owner, repo, assetId' })
-            };
+            return jsonResponse(400, { error: 'Missing required parameters: owner, repo, assetId' });
+        }
+        if (!isAllowedAsset(owner, repo, assetId)) {
+            return jsonResponse(404, { error: 'Release asset not found' });
         }
 
-        // Get token from environment variable
-        const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-
-        if (!GITHUB_TOKEN) {
+        const token = process.env.GITHUB_TOKEN;
+        if (!token) {
             throw new Error('GITHUB_TOKEN not configured');
         }
 
-        // Check if client wants JSON response (for desktop apps)
-        const acceptHeader = event.headers['accept'] || event.headers['Accept'] || '';
+        const requestHeaders = event.headers || {};
+        const acceptHeader = requestHeaders.accept || requestHeaders.Accept || '';
         const wantsJson = acceptHeader.includes('application/json');
-
-        // Fetch the asset metadata from GitHub to get the download URL
-        const url = `https://api.github.com/repos/${owner}/${repo}/releases/assets/${assetId}`;
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/octet-stream',
-                'User-Agent': 'Private-Releases-Site'
-            },
-            redirect: 'manual'  // Don't follow redirects automatically
-        });
-
-        // GitHub returns a 302 redirect to the actual download URL (S3)
-        if (response.status === 302 || response.status === 301) {
-            const downloadUrl = response.headers.get('location');
-            if (downloadUrl) {
-                // If client wants JSON, return the URL as JSON (for desktop apps)
-                if (wantsJson) {
-                    return {
-                        statusCode: 200,
-                        headers: { ...headers, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            url: downloadUrl,
-                            filename: filename
-                        })
-                    };
-                }
-
-                // Otherwise redirect the browser to the download URL
-                return {
-                    statusCode: 302,
-                    headers: {
-                        'Location': downloadUrl,
-                        'Cache-Control': 'no-cache'
-                    },
-                    body: ''
-                };
-            }
-        }
-
-        if (!response.ok) {
-            console.error(`Failed to get asset download URL: ${response.status}`);
-            return {
-                statusCode: response.status,
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    error: `Failed to get download URL: ${response.status} ${response.statusText}`
-                })
-            };
-        }
-
-        // Fallback: if no redirect, something went wrong
-        return {
-            statusCode: 500,
-            headers: { ...headers, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                error: 'Unable to get download URL from GitHub'
-            })
-        };
+        const response = await fetchAsset(assetId, token);
+        return formatAssetResponse(response, filename, wantsJson);
 
     } catch (error) {
         console.error('Error in download-asset function:', error);
-        return {
-            statusCode: 500,
-            headers: { ...headers, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                error: 'Internal server error',
-                message: error.message
-            })
-        };
+        return jsonResponse(500, { error: 'Internal server error', message: error.message });
     }
 };

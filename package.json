@@ -4,7 +4,8 @@
   "description": "Secure private GitHub releases viewer",
   "main": "index.html",
   "scripts": {
-    "dev": "netlify dev"
+    "dev": "netlify dev",
+    "test": "node --test"
   },
   "keywords": ["github", "releases", "private", "netlify"],
   "author": "Tashi Rabten",

@@ -57,16 +57,14 @@ A secure web application that makes releases from your **private** GitHub reposi
 
 After deploying to Netlify, set the environment variable:
 
-**In Netlify UI:**
+**In Netlify UI (recommended):**
 1. Go to Site settings → Environment variables
 2. Add variable:
    - Key: `GITHUB_TOKEN`
-   - Value: Your GitHub personal access token
+   - Value: enter the token in Netlify's masked value field
 
-**Or via CLI:**
-```bash
-netlify env:set GITHUB_TOKEN your_token_here
-```
+Create a fine-grained token with read-only access to the private `TashiRabten/GlossarioBUDA`
+repository. Do not put its value in a shell command, tracked file, or browser code.
 
 ### 2. Add/Remove Repositories
 
@@ -138,9 +136,9 @@ The API returns the exact same JSON format as GitHub, so your existing update lo
    - Choose "GitHub" and authorize
    - Select repository: `TashiRabten/rel-site-2025`
    - Settings auto-detect from `netlify.toml`
-   - **IMPORTANT:** Add environment variable:
-     - Key: `GITHUB_TOKEN`
-     - Value: `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`
+   - Before deploying, add `GITHUB_TOKEN` in the site's environment-variable settings. Use a
+     fine-grained token with read-only access to `TashiRabten/GlossarioBUDA`; enter the value in
+     Netlify's masked field.
    - Click "Deploy site"
 
 3. **Configure custom domain** (optional):
@@ -159,12 +157,12 @@ netlify login
 # Initialize site
 netlify init
 
-# Set environment variable
-netlify env:set GITHUB_TOKEN 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
-
 # Deploy
 netlify deploy --prod
 ```
+
+Set `GITHUB_TOKEN` separately in Netlify's environment-variable settings. Do not pass its value
+to the CLI as an argument.
 
 ### Local Testing with Netlify Dev
 
@@ -172,8 +170,9 @@ netlify deploy --prod
 # Install dependencies
 npm install
 
-# Create .env file
-echo "GITHUB_TOKEN=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" > .env
+# Copy the template, then enter the token in a local editor.
+Copy-Item .env.example .env
+notepad .env
 
 # Run locally (simulates Netlify environment)
 netlify dev
@@ -213,10 +212,10 @@ Your GitHub token needs:
 
 ### Best Practices
 
-1. **Rotate your token periodically** - Generate a new token every few months
+1. **Limit token access** - Use a fine-grained token scoped to the private release repository
 2. **Use environment variables only** - Never commit tokens to git
 3. **Monitor token usage** - Check GitHub settings for token activity
-4. **Limit token scope** - Only grant `repo` access, nothing more
+4. **Replace it after a compromise or access change** - Revoke it if it is exposed or no longer needed
 
 ## Workflow: Releasing a New Version
 

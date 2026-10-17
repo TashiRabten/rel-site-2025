@@ -1,5 +1,5 @@
 /**
- * TradutorBUDA download page.
+ * BUDA Suite download page.
  *
  * Renders a curated downloads experience on top of the GlossarioBUDA GitHub
  * releases (fetched via the secure Netlify backend): the main Java-only app
@@ -53,6 +53,8 @@ const APPS = [
       summary: 'Tradutor de tibetano com IA — dicionário, OCR e traduções ranqueadas.' },
     { id: 'glossario', name: 'GlossárioBUDA', match: 'glossario', exclude: 'segbuda',
       summary: 'Glossário e gerenciador de termos budistas multilíngue.' },
+    { id: 'scanbuda', name: 'ScanBUDA', match: 'scanbuda', exclude: null,
+      summary: 'Scanner de PDFs no formato do GlossárioBUDA, com extração OCR e revisão local.' },
     { id: 'legendasbuda', name: 'LegendasBUDA', match: 'legendasbuda', exclude: null,
       summary: 'Visualizador de legendas para vídeos do YouTube.' },
     { id: 'namsel', name: 'Namsel OCR', match: 'namsel', exclude: null,
@@ -175,19 +177,21 @@ function button(asset, os, { secondary = false, recommended = false, archLabel =
     const cls = ['dl'];
     if (secondary) cls.push('secondary');
     if (recommended) cls.push('recommended');
-    const label = archLabel ? `${osLabel(os)} · ${archLabel}` : `${osLabel(os)}`;
+    const label = escapeHtml(archLabel ? `${osLabel(os)} · ${archLabel}` : `${osLabel(os)}`);
+    const buttonClass = escapeHtml(cls.join(' '));
     if (!asset) {
-        return `<a class="${cls.join(' ')}" aria-disabled="true" title="Ainda não publicado">
+        return `<a class="${buttonClass}" aria-disabled="true" title="Ainda não publicado">
                   <span class="os">${osIcon(os)}</span>${label} · indisponível</a>`;
     }
-    const size = fmtBytes(asset.size);
-    return `<a class="${cls.join(' ')}" href="${asset.url}">
+    const size = escapeHtml(fmtBytes(asset.size));
+    return `<a class="${buttonClass}" href="${escapeHtml(asset.url)}">
               <span class="os">${osIcon(os)}</span>${label}${size ? ` · ${size}` : ''}</a>`;
 }
 
 function renderApps(assets) {
     const el = document.getElementById('apps');
-    el.innerHTML = APPS.map(a => {
+    // Dynamic text and attributes are HTML-escaped before interpolation below.
+    el.innerHTML = /* nosemgrep: Semgrep_javascript.browser.security.insecure-document-method.insecure-document-method,Semgrep_javascript.browser.security.insecure-innerhtml.insecure-innerhtml */ APPS.map(a => {
         const win = findInstaller(assets, a, 'windows');
         const winFirst = OS !== 'mac';
         const w = button(win, 'windows', { secondary: !winFirst, recommended: a.primary && OS === 'windows' });
@@ -208,14 +212,14 @@ function renderApps(assets) {
 
         const ref = OS === 'mac' ? macRef : win;
         const ver = ref && ref.tag
-            ? `<div class="meta">Versão ${ref.tag.replace(/^[a-zA-Z-]*v?/, 'v')}</div>` : '';
+            ? `<div class="meta">Versão ${escapeHtml(ref.tag.replace(/^[a-zA-Z-]*v?/, 'v'))}</div>` : '';
         return `
-            <div class="bundle app">
+            <div class="bundle app" id="${escapeHtml(a.id)}">
                 <div class="top">
-                    <h3>${a.name}</h3>
+                    <h3>${escapeHtml(a.name)}</h3>
                     ${a.primary ? '<span class="badge add">Principal</span>' : ''}
                 </div>
-                <div class="summary">${a.summary}</div>
+                <div class="summary">${escapeHtml(a.summary)}</div>
                 ${ver}
                 <div class="actions">${winFirst ? w + m : m + w}</div>
             </div>`;
@@ -224,12 +228,13 @@ function renderApps(assets) {
 
 function renderBundles(assets) {
     const el = document.getElementById('bundles');
-    el.innerHTML = BUNDLES.map(b => {
+    // Dynamic text and attributes are HTML-escaped before interpolation below.
+    el.innerHTML = /* nosemgrep: Semgrep_javascript.browser.security.insecure-document-method.insecure-document-method,Semgrep_javascript.browser.security.insecure-innerhtml.insecure-innerhtml */ BUNDLES.map(b => {
         const win = b.available ? findBundle(assets, b, 'windows') : null;
         const mac = b.available ? findBundle(assets, b, 'mac') : null;
-        const models = b.models.map(m => `<li>${m}</li>`).join('');
+        const models = b.models.map(m => `<li>${escapeHtml(m)}</li>`).join('');
         const requires = b.requires
-            ? `<div class="meta">Requer: <b>${b.requires}</b></div>` : '';
+            ? `<div class="meta">Requer: <b>${escapeHtml(b.requires)}</b></div>` : '';
         let actions;
         if (!b.available) {
             actions = `<a class="dl" aria-disabled="true">Em breve</a>`;
@@ -242,10 +247,10 @@ function renderBundles(assets) {
         return `
             <div class="bundle ${b.available ? '' : 'soon'}">
                 <div class="top">
-                    <h3>${b.name}</h3>
-                    <span class="badge ${b.badge.cls}">${b.badge.text}</span>
+                    <h3>${escapeHtml(b.name)}</h3>
+                    <span class="badge ${escapeHtml(b.badge.cls)}">${escapeHtml(b.badge.text)}</span>
                 </div>
-                <div class="summary">${b.summary}</div>
+                <div class="summary">${escapeHtml(b.summary)}</div>
                 ${requires}
                 <ul class="models">${models}</ul>
                 <div class="actions">${actions}</div>
@@ -268,14 +273,15 @@ function renderData(assets) {
     const m = button(mac, 'mac', { secondary: winFirst });
     const ref = OS === 'mac' ? mac : win;
     const ver = ref && ref.tag
-        ? `<div class="meta">Versão ${ref.tag.replace(/^[a-zA-Z-]*v?/, 'v')}</div>` : '';
-    el.innerHTML = `
+        ? `<div class="meta">Versão ${escapeHtml(ref.tag.replace(/^[a-zA-Z-]*v?/, 'v'))}</div>` : '';
+    // Dynamic release fields are HTML-escaped before interpolation below.
+    el.innerHTML = /* nosemgrep: Semgrep_javascript.browser.security.insecure-document-method.insecure-document-method,Semgrep_javascript.browser.security.insecure-innerhtml.insecure-innerhtml */ `
         <div class="bundle">
             <div class="top">
-                <h3>${DATA.name}</h3>
+                <h3>${escapeHtml(DATA.name)}</h3>
                 <span class="badge req">Necessário</span>
             </div>
-            <div class="summary">${DATA.summary}</div>
+            <div class="summary">${escapeHtml(DATA.summary)}</div>
             <div class="meta">Substitui o banco em <b>Documentos/glossariobuda</b></div>
             ${ver}
             <div class="actions">${winFirst ? w + m : m + w}</div>
@@ -290,8 +296,9 @@ async function load() {
         renderBundles(assets);
     } catch (e) {
         console.error(e);
-        const msg = `<div class="err">Não foi possível carregar os downloads: ${e.message}</div>`;
-        document.getElementById('apps').innerHTML = msg;
+        const msg = `<div class="err">Não foi possível carregar os downloads: ${escapeHtml(e.message)}</div>`;
+        // The error text is HTML-escaped before assignment.
+        document.getElementById('apps').innerHTML = msg; // nosemgrep: Semgrep_javascript.browser.security.insecure-document-method.insecure-document-method,Semgrep_javascript.browser.security.insecure-innerhtml.insecure-innerhtml
         const dataEl = document.getElementById('data'); if (dataEl) dataEl.innerHTML = '';
         document.getElementById('bundles').innerHTML = '';
     }

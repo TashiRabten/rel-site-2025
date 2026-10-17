@@ -222,6 +222,15 @@ async function checkForUpdates() {
 }
 ```
 
+## ScanBUDA
+
+ScanBUDA releases are published to `TashiRabten/GlossarioBUDA` with tags in the
+`scanbuda-vX.Y.Z` format and Windows assets named `ScanBUDA-X.Y.Z.exe`. The download
+page discovers the installer by its filename. ScanBUDA's updater uses this same releases
+endpoint, selects only `scanbuda-v` releases, and downloads through the Netlify asset proxy.
+The proxy is restricted to assets in `TashiRabten/GlossarioBUDA`; the desktop updater also
+validates the proxy host, path, repository, asset ID, and installer filename before downloading.
+
 ## Questions?
 
 If you run into issues:

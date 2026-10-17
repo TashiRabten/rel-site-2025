@@ -1,6 +1,6 @@
 /**
  * Netlify Function: Get Releases
- * Securely fetches releases from private GitHub repositories
+ * Securely fetches releases from the private GlossarioBUDA repository
  */
 
 const fetch = require('node-fetch');
