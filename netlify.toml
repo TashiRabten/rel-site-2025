@@ -21,3 +21,10 @@
   from = "/manual/tradutorbuda/"
   to = "/manual/tradutorbuda/Manual_do_Usu%C3%A1rio.html"
   status = 200
+
+# Developer invite / password-reset page (Supabase sends the token in the URL fragment).
+# Serves set-password.html at /set-password so the Supabase Site URL can point here.
+[[redirects]]
+  from = "/set-password"
+  to = "/set-password.html"
+  status = 200
