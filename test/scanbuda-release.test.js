@@ -76,6 +76,38 @@ test('ScanBUDA release is exposed as a Windows download on the site', async () =
     assert.match(page.apps.innerHTML, /\.netlify\.app\/.netlify\/functions\/download-asset\?owner=TashiRabten&amp;repo=GlossarioBUDA&amp;assetId=42/);
 });
 
+test('SuiteBUDA standalone release is a distinct Windows app with a private download proxy', async () => {
+    const githubReleases = [{
+        id: 101,
+        tag_name: 'suitebuda-v1.0.0',
+        target_commitish: 'suitebuda',
+        name: 'SuiteBUDA 1.0.0',
+        published_at: '2026-10-29T12:00:00Z',
+        draft: false,
+        prerelease: false,
+        assets: [{
+            id: 43,
+            name: 'SuiteBUDA-1.0.0-windows-x64.exe',
+            size: 1234,
+            browser_download_url: 'https://github.com/TashiRabten/GlossarioBUDA/releases/download/suitebuda-v1.0.0/SuiteBUDA-1.0.0-windows-x64.exe',
+        }, {
+            id: 44,
+            name: 'SuiteBUDA-1.0.0-windows-x64.exe.manifest.json',
+            size: 200,
+            browser_download_url: 'https://github.com/TashiRabten/GlossarioBUDA/releases/download/suitebuda-v1.0.0/SuiteBUDA-1.0.0-windows-x64.exe.manifest.json',
+        }],
+    }];
+    const response = await loadReleaseFunction('netlify/functions/get-releases.js', githubReleases)({ httpMethod: 'GET' }, {});
+    assert.equal(response.statusCode, 200);
+    const page = loadPage(JSON.parse(response.body));
+    page.api.renderApps(await page.api.collectAssets());
+    assert.match(page.apps.innerHTML, /<h3>SuiteBUDA<\/h3>/);
+    assert.match(page.apps.innerHTML, /ambiente Java incluído/);
+    assert.match(page.apps.innerHTML, /SuiteBUDA-1\.0\.0-windows-x64\.exe/);
+    assert.match(page.apps.innerHTML, /assetId=43/);
+    assert.doesNotMatch(page.apps.innerHTML, /assetId=44/);
+});
+
 test('download proxy cannot use its GitHub token for another repository', async () => {
     let requestedUrl = null;
     const fakeFetch = async url => {

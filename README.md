@@ -7,6 +7,7 @@ A secure web application that makes releases from your **private** GitHub reposi
 - 🔒 **Private repo, public releases** - Source code stays private, releases are public
 - 🔄 **Auto-update compatible** - Works with your app's built-in update checker
 - 📦 Lists all release assets with download functionality
+- SuiteBUDA Windows downloads use the newest published installer through the release proxy.
 - 🎨 Beautiful, responsive UI for browsing releases
 - 📱 Mobile-friendly design
 - 🚀 Deployed on Netlify with serverless functions

@@ -55,6 +55,8 @@ const APPS = [
       summary: 'Glossário e gerenciador de termos budistas multilíngue.' },
     { id: 'scanbuda', name: 'ScanBUDA', match: 'scanbuda', exclude: null,
       summary: 'Scanner de PDFs no formato do GlossárioBUDA, com extração OCR e revisão local.' },
+    { id: 'suitebuda', name: 'SuiteBUDA', match: 'suitebuda', exclude: null,
+      summary: 'Chat e administração da equipe dos aplicativos BUDA, com ambiente Java incluído.' },
     { id: 'legendasbuda', name: 'LegendasBUDA', match: 'legendasbuda', exclude: null,
       summary: 'Visualizador de legendas para vídeos do YouTube.' },
     { id: 'namsel', name: 'Namsel OCR', match: 'namsel', exclude: null,
